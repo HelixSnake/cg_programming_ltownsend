@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <glew.h>
 
 // Namespaces...
 using namespace std;
