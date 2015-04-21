@@ -15,6 +15,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <fstream>
+#include <string>
 
 // Namespaces...
 using namespace glm; // For OpenGL math
