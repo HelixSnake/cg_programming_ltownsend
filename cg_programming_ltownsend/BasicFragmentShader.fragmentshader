@@ -1,9 +1,10 @@
 #version 330 core
 
 // Output data
-out vec3 color;
+in vec3 colorV;
+out vec3 pixelcolor;
 
 void main(){
 	// Output color = red
-	color = vec3(1,0,0);
+	pixelcolor = colorV;
 }

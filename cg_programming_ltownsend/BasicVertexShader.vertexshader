@@ -2,7 +2,12 @@
 
 layout(location = 0)
 in vec3 model_space_pos;
+layout(location = 1)
+in vec3 color;
+
+out vec3 colorV;
 
 void main(){
+	colorV = color;
 	gl_Position = vec4(model_space_pos, 1);
 }

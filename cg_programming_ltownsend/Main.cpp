@@ -149,6 +149,32 @@ GLuint& LoadQuad(){
 
 	return vertexBuffer;
 }
+GLuint& LoadQuadColors(){
+	static GLfloat g_vertex_buffer_data[] = {
+		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0,
+		1.0f, 0.0f, 0.0f, 0.0, 1.0, 0.0,
+		1.0f, 1.0f, 0.0f, 0.0, 0.0, 1.0,
+
+		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0,
+		1.0f, 1.0f, 0.0f, 0.0, 0.0, 1.0,
+		0.0f, 1.0f, 0.0f, 0.0, 1.0, 0.0
+	};
+
+	for(int i = 0, size = 36; i < size; ++i){
+		if (i%6 < 3)
+		{
+			g_vertex_buffer_data[i] -= 0.5f;
+		}
+	}
+
+	GLuint vertexBuffer = 0;
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	return vertexBuffer;
+}
+
 
 GLuint& LoadTriangle(){
 	static const GLfloat g_vertex_buffer_data[] = {
@@ -179,6 +205,29 @@ void RenderVertex(GLuint vertexBuffer){
 	);
 }
 
+void RenderColoredVertex(GLuint vertexBuffer){
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+	glVertexAttribPointer(
+		0,			//attribute layout
+		3,			//Elements in array
+		GL_FLOAT,	//Each element is of type float
+		GL_FALSE,	//Normalized?
+		sizeof(GL_FLOAT)*6,			//Stride...
+		(void*)0	//Array buffer offset...
+	);
+	glVertexAttribPointer(
+		1,			//attribute layout
+		3,			//Elements in array
+		GL_FLOAT,	//Each element is of type float
+		GL_FALSE,	//Normalized?
+		sizeof(GL_FLOAT)*6,			//Stride...
+		(void*)(sizeof(GL_FLOAT)*3)	//Array buffer offset...
+	);
+}
+
 void RenderTriangle(GLuint vertexBuffer){
 	RenderVertex(vertexBuffer);
 
@@ -188,6 +237,13 @@ void RenderTriangle(GLuint vertexBuffer){
 
 void RenderQuad(GLuint vertexBuffer){
 	RenderVertex(vertexBuffer);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisableVertexAttribArray(0);
+}
+
+void RenderQuadColors(GLuint vertexBuffer){
+	RenderColoredVertex(vertexBuffer);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDisableVertexAttribArray(0);
@@ -207,12 +263,13 @@ int main(){
 
 	GLuint triangleID = LoadTriangle();
 	GLuint quadID = LoadQuad();
+	GLuint quadcolorID = LoadQuadColors();
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
-		RenderQuad(quadID);
+		RenderQuadColors(quadcolorID);
 
 		//Update();
 		//Render();
