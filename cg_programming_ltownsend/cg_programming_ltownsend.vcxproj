@@ -76,6 +76,8 @@
   <ItemGroup>
     <None Include="BasicFragmentShader.fragmentshader" />
     <None Include="BasicVertexShader.vertexshader" />
+    <None Include="ColoredFragmentShader.fragmentshader" />
+    <None Include="ColoredVertexShader.vertexshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

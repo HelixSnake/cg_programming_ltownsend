@@ -31,5 +31,7 @@
     <None Include="BasicFragmentShader.fragmentshader">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ColoredFragmentShader.fragmentshader" />
+    <None Include="ColoredVertexShader.vertexshader" />
   </ItemGroup>
 </Project>
