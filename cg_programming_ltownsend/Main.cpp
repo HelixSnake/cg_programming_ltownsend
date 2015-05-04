@@ -301,8 +301,9 @@ int main(){
 	float ballX = 0;
 	float ballY = 0;
 	float paddleWidth = 0.1f;
-	float paddleHeight = 1.0f;
+	float paddleHeight = 0.5f;
 	float paddleDistance = 1.5f;
+	float paddleSpeed = 0.7f;
 	float ballRadius = 0.1f;
 	float ballVX = 1.0f;
 	float ballVY = 1.0f;
@@ -319,20 +320,21 @@ int main(){
 		// Game Update Code
 		float deltaTime = GetDeltaTime();
 
-		if (ballX > arenaWidth) {
-			ballX = arenaWidth;
+		if (ballX > arenaWidth - ballRadius) {
+			ballX = 0;
+			ballY = 0;
+		}
+		if (ballX < -arenaWidth + ballRadius) {
+			ballX = 0;
+			ballY = 0;
 			ballVX = -ballVX;
 		}
-		if (ballX < 0 - arenaWidth) {
-			ballX = -arenaWidth;
-			ballVX = -ballVX;
-		}
-		if (ballY > arenaHeight) {
-			ballY = arenaHeight;
+		if (ballY > arenaHeight - ballRadius) {
+			ballY = arenaHeight - ballRadius;
 			ballVY = -ballVY;
 		}
-		if (ballY < -arenaHeight) {
-			ballY = -arenaHeight;
+		if (ballY < -arenaHeight + ballRadius) {
+			ballY = -arenaHeight + ballRadius;
 			ballVY = -ballVY;
 		}
 
@@ -341,7 +343,7 @@ int main(){
 		ballX += ballVX * deltaTime;
 		ballY += ballVY * deltaTime;
 
-		//check left paddle
+		//check ball collision with paddles
 		if (ballX < -paddleDistance + ballRadius + realPaddleWidth &&
 			ballX > -paddleDistance - ballRadius - realPaddleWidth &&
 			ballY < paddleLY + realPaddleHeight + ballRadius &&
@@ -357,6 +359,16 @@ int main(){
 		{
 			ballVX = -abs(ballVX);
 		}
+
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) paddleLY += paddleSpeed * deltaTime;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) paddleLY -= paddleSpeed * deltaTime;
+		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) paddleRY += paddleSpeed * deltaTime;
+		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) paddleRY -= paddleSpeed * deltaTime;
+
+		if (paddleLY > paddleMaxY) paddleLY = paddleMaxY;
+		if (paddleLY < -paddleMaxY) paddleLY = -paddleMaxY;
+		if (paddleRY > paddleMaxY) paddleRY = paddleMaxY;
+		if (paddleRY < -paddleMaxY) paddleRY = -paddleMaxY;
 
 		// Rendering Code
 		mat4 ViewMatrix = lookAt(
