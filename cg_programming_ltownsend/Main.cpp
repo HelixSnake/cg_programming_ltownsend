@@ -2,6 +2,13 @@
 
 GLFWwindow* window = NULL;
 
+
+struct vector2
+{
+	float x;
+	float y;
+};
+
 int InitWindowFailed(){
 	if(glfwInit() == GLFW_FAIL){
 		fprintf(stderr, "Failed to initialize GLFW\n");
@@ -270,6 +277,11 @@ float& GetDeltaTime(){
 	return deltaTime;
 }
 
+float DotProduct(vector2 v1, vector2 v2)
+{
+	return v1.x*v2.x + v1.y*v2.y;
+}
+
 int main(){
 	if(InitWindowFailed() | InitGlewFailed()){
 		return EXIT_WITH_ERROR;
@@ -297,18 +309,24 @@ int main(){
 	glUseProgram(programID);
 			
 	float paddleLY = 0;
-	float paddleRY = 0.5f;
+	float paddleRY = 0;
+	float paddleLV = 0;
+	float paddleRV = 0;
 	float ballX = 0;
 	float ballY = 0;
-	float paddleWidth = 0.1f;
+	float paddleWidth = 0.03f;
 	float paddleHeight = 0.5f;
 	float paddleDistance = 1.5f;
 	float paddleSpeed = 0.7f;
-	float ballRadius = 0.1f;
+	float ballVisRadius = 0.1f;
+	float ballRadius = 0.05f;
 	float ballVX = 1.0f;
 	float ballVY = 1.0f;
 	float arenaHeight = 1.0f;
-	float arenaWidth = 2.0f;
+	float arenaWidth = 3.0f;
+	
+	float cameraX = 0;
+	float cameraY = 0;
 
 	float paddleMaxY = arenaHeight - paddleHeight / 2;
 	float realPaddleWidth = paddleWidth / 2;
@@ -320,14 +338,18 @@ int main(){
 		// Game Update Code
 		float deltaTime = GetDeltaTime();
 
+		// sides and top/bottom of screen collision;
 		if (ballX > arenaWidth - ballRadius) {
 			ballX = 0;
 			ballY = 0;
+			ballVX = -ballVX;
+			ballVY = 1.0f;
 		}
 		if (ballX < -arenaWidth + ballRadius) {
 			ballX = 0;
 			ballY = 0;
 			ballVX = -ballVX;
+			ballVY = 1.0f;
 		}
 		if (ballY > arenaHeight - ballRadius) {
 			ballY = arenaHeight - ballRadius;
@@ -338,51 +360,69 @@ int main(){
 			ballVY = -ballVY;
 		}
 
+		// keep deltaTime from getting too high;
 		if (deltaTime > 1) deltaTime = 1;
 
+		// move ball based on velocity and time;
 		ballX += ballVX * deltaTime;
 		ballY += ballVY * deltaTime;
+
+
+		paddleLV = 0;
+		paddleRV = 0;
+		
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) paddleLV += paddleSpeed;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) paddleLV -= paddleSpeed;
+		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) paddleRV += paddleSpeed;
+		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) paddleRV -= paddleSpeed;
+
+		paddleLY += paddleLV * deltaTime;
+		paddleRY += paddleRV * deltaTime;
 
 		//check ball collision with paddles
 		if (ballX < -paddleDistance + ballRadius + realPaddleWidth &&
 			ballX > -paddleDistance - ballRadius - realPaddleWidth &&
 			ballY < paddleLY + realPaddleHeight + ballRadius &&
-			ballY > paddleLY - realPaddleHeight - ballRadius)
+			ballY > paddleLY - realPaddleHeight - ballRadius && ballVX < 0)
 		{
-			ballVX = abs(ballVX);
+			ballVX = -ballVX;
+			ballVY += paddleLV;
 		}
 
 		if (ballX < paddleDistance + ballRadius + realPaddleWidth &&
 			ballX > paddleDistance - ballRadius - realPaddleWidth &&
 			ballY < paddleRY + realPaddleHeight + ballRadius &&
-			ballY > paddleRY - realPaddleHeight - ballRadius)
+			ballY > paddleRY - realPaddleHeight - ballRadius && ballVX > 0)
 		{
-			ballVX = -abs(ballVX);
+			ballVX = -ballVX;
+			ballVY += paddleRV;
 		}
-
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) paddleLY += paddleSpeed * deltaTime;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) paddleLY -= paddleSpeed * deltaTime;
-		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) paddleRY += paddleSpeed * deltaTime;
-		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) paddleRY -= paddleSpeed * deltaTime;
 
 		if (paddleLY > paddleMaxY) paddleLY = paddleMaxY;
 		if (paddleLY < -paddleMaxY) paddleLY = -paddleMaxY;
 		if (paddleRY > paddleMaxY) paddleRY = paddleMaxY;
 		if (paddleRY < -paddleMaxY) paddleRY = -paddleMaxY;
 
+		cameraX += (-ballX - cameraX) * 0.1f;
+		cameraY += (-ballY - cameraY) * 0.1f;
+
 		// Rendering Code
 		mat4 ViewMatrix = lookAt(
-			vec3(0, 0, 3),
+			vec3(cameraX, cameraY, 3),
 			vec3(0, 0, 0),
 			vec3(0, 1, 0)
 		);
 
-		mat4 MVPMatrixBall = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(ballX, ballY, 0), vec3(ballRadius, ballRadius, 1.0f));
+		mat4 MVPMatrixBall = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(ballX, ballY, 0), vec3(ballVisRadius, ballVisRadius, 1.0f));
 		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrixBall[0][0]);
 		mat4 MVPMatrixPaddleL = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(-paddleDistance, paddleLY, 0), vec3(paddleWidth, paddleHeight, 1.0f));
 		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrixPaddleL[0][0]);
 		mat4 MVPMatrixPaddleR = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(paddleDistance, paddleRY, 0), vec3(paddleWidth, paddleHeight, 1.0f));
 		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrixPaddleR[0][0]);
+		mat4 MVPLevelTop = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(0, 1, 0), vec3(20, 0.02f, 1.0f));
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPLevelTop[0][0]);
+		mat4 MVPLevelBottom = projectionMatrix * ViewMatrix * RenderQuad(quadID, vec3(0, -1, 0), vec3(20, 0.02f, 1.0f));
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPLevelBottom[0][0]);
 		//Render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
