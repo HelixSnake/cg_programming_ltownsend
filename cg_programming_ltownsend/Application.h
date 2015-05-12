@@ -42,3 +42,8 @@ using namespace std;
 extern GLFWwindow* window;
 extern GLint shaderStatus;
 extern bool activeRef;
+
+struct Camera{
+	GLuint MVPMatrixID;
+	mat4 projectionMatrix, viewMatrix, MVPMatrix;
+};
