@@ -2,7 +2,7 @@
 
 World::World(){
 
-	objects = new Object[numObjects = 1];
+	objects = new TexturedObject[numObjects = 1];
 	objects[0].SetPosition(vec3(0, 0, 0));
 	objects[0].SetScale(vec3(1, 1, 1));
 

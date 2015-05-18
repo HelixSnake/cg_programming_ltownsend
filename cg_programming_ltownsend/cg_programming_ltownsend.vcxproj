@@ -68,13 +68,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BitmapReader.cpp" />
+    <ClCompile Include="LevelReader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="TexturedObject.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="BitmapReader.h" />
+    <ClInclude Include="LevelReader.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="TexturedObject.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -82,9 +88,14 @@
     <None Include="BasicVertexShader.vertexshader" />
     <None Include="ColoredFragmentShader.fragmentshader" />
     <None Include="ColoredVertexShader.vertexshader" />
+    <None Include="TexturedFragmentShader.fragmentshader" />
+    <None Include="TexturedVertexShader.vertexshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="smiley.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

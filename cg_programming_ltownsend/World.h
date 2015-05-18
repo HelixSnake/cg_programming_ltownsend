@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "TexturedObject.h"
 
 class World{
 
