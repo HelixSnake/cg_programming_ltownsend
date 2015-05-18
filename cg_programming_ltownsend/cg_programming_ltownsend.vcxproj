@@ -69,7 +69,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BitmapReader.cpp" />
-    <ClCompile Include="LevelReader.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="TexturedObject.cpp" />
@@ -78,7 +78,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="BitmapReader.h" />
-    <ClInclude Include="LevelReader.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="TexturedObject.h" />
     <ClInclude Include="World.h" />

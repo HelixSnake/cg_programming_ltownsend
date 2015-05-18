@@ -30,7 +30,7 @@
     <ClCompile Include="TexturedObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelReader.cpp">
+    <ClCompile Include="Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClInclude Include="TexturedObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelReader.h">
+    <ClInclude Include="Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
