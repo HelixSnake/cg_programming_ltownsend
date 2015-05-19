@@ -1,4 +1,6 @@
 #include "Application.h"
+#include <fstream>
+#include <iostream>
 #pragma once
 
 class Level {
@@ -9,6 +11,9 @@ public:
 	void Clear();
 	bool SetTile(int x, int y, int value);
 	int GetTile(int x, int y);
+	int GetWidth();
+	int GetHeight();
+	void Print();
 private:
 	int* _tiles;
 	int _width;

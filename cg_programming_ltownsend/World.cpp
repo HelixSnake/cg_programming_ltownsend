@@ -6,6 +6,9 @@ World::World(){
 	objects[0].SetPosition(vec3(0, 0, 0));
 	objects[0].SetScale(vec3(1, 1, 1));
 
+	level = new Level("Text.txt");
+	level->Print();
+
 	SaveObjectStates();
 
 	resetKey = GLFW_KEY_SPACE;
@@ -14,6 +17,8 @@ World::World(){
 World::~World(){
 	delete[] objects;
 	objects = NULL;
+	delete level;
+	level = NULL;
 }
 
 void World::LoadObjectStates(){

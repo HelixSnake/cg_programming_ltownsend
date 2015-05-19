@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "TexturedObject.h"
+#include "Level.h"
 
 class World{
 
@@ -17,4 +18,5 @@ class World{
 		int resetKey;
 		GLuint numObjects;
 		Object* objects;
+		Level* level;
 };
