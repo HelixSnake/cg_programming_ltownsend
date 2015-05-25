@@ -1,8 +1,8 @@
 #include "Level.h"
 
-Level::Level(int width, int height)
+Level::Level(int width, int height, int numImages)
 {
-	_Init(width, height);
+	_Init(width, height, numImages);
 }
 Level::Level(const char *filename)
 {
@@ -14,7 +14,7 @@ Level::Level(const char *filename)
 	if (!getline(file, instr))
 	{
 		printf("Failed to load height");
-		_Init(1,1);
+		_Init(1,1,1);
 		file.close();
 		return;
 	}
@@ -22,14 +22,32 @@ Level::Level(const char *filename)
 	if (!getline(file, instr))
 	{
 		printf("Failed to load width");
-		_Init(1,1);
+		_Init(1,1,1);
 		file.close();
 		return;
 	}
 	_width = std::stoi(instr);
 
+	if (!getline(file, instr))
+	{
+		printf("Failed to load image amount");
+		_Init(1,1,1);
+		file.close();
+		return;
+	}
+	_numTileImages = std::stoi(instr);
+
 	int arrLength = _height * _width;
-	_Init(_height, _width);
+	_Init(_height, _width, _numTileImages);
+
+	for (int i = 0; i < _numTileImages; i++)
+	{
+		file >> instr;
+		_tileImages[i] = new char[instr.length() + 1];
+		strcpy(_tileImages[i], instr.data());
+		file >> instr;
+		_tileImageIndexes[i] = std::stoi(instr);
+	}
 
 	for (int i = 0; i < arrLength; i++)
 	{
@@ -77,6 +95,10 @@ int Level::GetHeight()
 
 void Level::Print()
 {
+	for (int i = 0; i < _numTileImages; i++)
+	{
+		cout << _tileImages[i] << " " << _tileImageIndexes[i] << endl;
+	}
 	for (int i = 0; i < _height; i++)
 	{
 		for (int j = 0; j < _width; j++)
@@ -87,7 +109,7 @@ void Level::Print()
 	}
 }
 
-void Level::_Init(int width, int height)
+void Level::_Init(int width, int height, int numImages)
 {
 	if (width <= 0 || height <= 0)
 	{
@@ -101,5 +123,14 @@ void Level::_Init(int width, int height)
 	for (int i = 0; i < arrayLength; i++)
 	{
 		_tiles[i] = 0;
+	}
+
+	_numTileImages = numImages;
+	_tileImageIndexes = new int[numImages];
+	_tileImages = new char*[numImages];
+	for (int i = 0; i < numImages; i++)
+	{
+		_tileImageIndexes[i] = 0;
+		_tileImages[i] = "";
 	}
 }

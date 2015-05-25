@@ -1,5 +1,10 @@
 6
 6
+4
+grass.bmp 0
+dirt.bmp 1
+rock.bmp 2
+flower.bmp 3
 0 0 1 0 0 2
 0 1 0 2 3 0
 0 1 0 2 3 0

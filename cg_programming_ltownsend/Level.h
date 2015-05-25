@@ -5,7 +5,7 @@
 
 class Level {
 public:
-	Level(int width, int height);
+	Level(int width, int height, int numImages);
 	Level(const char *filename);
 	~Level();
 	void Clear();
@@ -18,5 +18,8 @@ private:
 	int* _tiles;
 	int _width;
 	int _height;
-	void _Init(int width, int height);
+	void _Init(int width, int height, int numImages);
+	int _numTileImages;
+	char** _tileImages;
+	int* _tileImageIndexes;
 };
