@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "BitmapReader.h"
 #include <fstream>
 #include <iostream>
 #pragma once
@@ -7,6 +8,8 @@ class Level {
 public:
 	Level(int width, int height, int numImages);
 	Level(const char *filename);
+	void GenerateImageIDs();
+	GLuint GetImageID(int index);
 	~Level();
 	void Clear();
 	bool SetTile(int x, int y, int value);
@@ -22,4 +25,5 @@ private:
 	int _numTileImages;
 	char** _tileImages;
 	int* _tileImageIndexes;
+	GLuint* _tileImageIDs;
 };

@@ -17,6 +17,6 @@ class World{
 	private:
 		int resetKey;
 		GLuint numObjects;
-		Object* objects;
+		Object** objects;
 		Level* level;
 };

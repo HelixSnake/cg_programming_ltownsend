@@ -14,6 +14,9 @@ class TexturedObject : public Object{
 
 		void SetPosition(vec3 position);
 		void SetScale(vec3 scale);
+		void SetTexture(GLuint unTextureID);
+
+		GLuint GetTexture();
 
 		vec3 GetPosition();
 		float GetLeftX();
@@ -27,7 +30,6 @@ class TexturedObject : public Object{
 
 	protected:
 		TexturedObject* objectState;
-		vec3 position, scale;
 
 	private:
 		float leftX, rightX, topY, bottomY;

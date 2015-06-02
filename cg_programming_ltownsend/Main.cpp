@@ -319,7 +319,7 @@ int main(){
 
 		// Rendering Code
 		camera.viewMatrix = lookAt(
-			vec3(0, 0, 3),
+			vec3(0, 0, 20),
 			vec3(0, 0, 0),
 			vec3(0, 1, 0)
 		);

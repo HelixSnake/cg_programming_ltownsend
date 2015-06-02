@@ -61,6 +61,22 @@ Level::Level(const char *filename)
 Level::~Level()
 {
 	delete _tiles;
+	delete _tileImageIDs;
+	delete _tileImageIndexes;
+	delete[] _tileImages;
+}
+
+void Level::GenerateImageIDs()
+{
+	for (int i = 0; i < _numTileImages; i++)
+	{
+		_tileImageIDs[i] = BitmapReader::loadBMP_custom(_tileImages[i]);
+	}
+}
+GLuint Level::GetImageID(int index)
+{
+	if (index < 0 || index > _numTileImages) return 0;
+	else return _tileImageIDs[index];
 }
 
 void Level::Clear()
@@ -103,7 +119,7 @@ void Level::Print()
 	{
 		for (int j = 0; j < _width; j++)
 		{
-			cout << _tiles[i * _width + j] << " ";
+			cout << GetTile(j, i) << " ";
 		}
 		cout << endl;
 	}
@@ -128,9 +144,11 @@ void Level::_Init(int width, int height, int numImages)
 	_numTileImages = numImages;
 	_tileImageIndexes = new int[numImages];
 	_tileImages = new char*[numImages];
+	_tileImageIDs = new GLuint[numImages];
 	for (int i = 0; i < numImages; i++)
 	{
 		_tileImageIndexes[i] = 0;
 		_tileImages[i] = "";
+		_tileImageIDs[i] = 0;
 	}
 }

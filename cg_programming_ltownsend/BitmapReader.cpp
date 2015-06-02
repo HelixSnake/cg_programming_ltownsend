@@ -19,7 +19,7 @@ GLuint BitmapReader::loadBMP_custom(const char * imagepath)
 
 	if ( fread(header, 1, 54, file)!=54 ){ // If not 54 bytes read : problem
 		printf("Not a correct BMP file\n");
-		return false;
+		return 0;
 	}	
 
 	if ( header[0]!='B' || header[1]!='M' ){
@@ -58,4 +58,5 @@ GLuint BitmapReader::loadBMP_custom(const char * imagepath)
  
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	return textureID;
 }

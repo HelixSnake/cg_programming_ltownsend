@@ -25,6 +25,14 @@ void TexturedObject::SetScale(vec3 scale){
 	this->scale = scale;
 }
 
+void TexturedObject::SetTexture(GLuint unTextureID){
+	this->textureID = unTextureID;
+}
+
+GLuint TexturedObject::GetTexture(){
+	return textureID;
+}
+
 vec3 TexturedObject::GetPosition(){
 	return position;
 }
@@ -132,6 +140,8 @@ mat4 TexturedObject::Render(){
 	glDrawArrays(renderMode, 0, numIndices);	//GL_TRIANGLE_STRIP or GL_TRIANGLES
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	
+	glBindTexture(GL_TEXTURE_2D, this->textureID);
 
 	//Every object starts off with an identity matrix...
 	/*mat4 objectMatrix = mat4(1.0f);
