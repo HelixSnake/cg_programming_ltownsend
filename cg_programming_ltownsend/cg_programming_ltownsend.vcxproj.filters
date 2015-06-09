@@ -33,6 +33,12 @@
     <ClCompile Include="Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureStore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -53,6 +59,12 @@
     <ClInclude Include="Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BasicVertexShader.vertexshader">
@@ -71,6 +83,30 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="smiley.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="char3a.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="char1a.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="char2a.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="char2b.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="dirt.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="flower.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="grass.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rock.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -23,6 +23,9 @@ World::World(){
 		}
 		cout << endl;
 	}
+	mainChar = new PlayerObject();
+	((PlayerObject*)mainChar)->SetPosition(vec3(0, 0, 0));
+	((PlayerObject*)mainChar)->SetScale(vec3(1, 1, 1));
 
 	//SaveObjectStates();
 
@@ -58,6 +61,7 @@ void World::Update(const float& deltaTime){
 	for(GLuint i = 0; i < numObjects; ++i){
 		objects[i]->Update(deltaTime);
 	}
+	((PlayerObject*)mainChar)->Update(deltaTime);
 	ResetWorld();
 }
 
@@ -65,4 +69,11 @@ void World::Render(const Camera& camera){
 	for(GLuint i = 0; i < numObjects; ++i){
 		objects[i]->Render(camera);
 	}
+	mainChar->Render(camera);
+	mainChar->Render(camera);
+}
+
+vec3 World::GetMainCharPos()
+{
+	return mainChar->GetPosition();
 }

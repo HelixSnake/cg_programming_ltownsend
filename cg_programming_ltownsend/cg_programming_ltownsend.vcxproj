@@ -72,7 +72,9 @@
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PlayerObject.cpp" />
     <ClCompile Include="TexturedObject.cpp" />
+    <ClCompile Include="TextureStore.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -80,7 +82,9 @@
     <ClInclude Include="BitmapReader.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PlayerObject.h" />
     <ClInclude Include="TexturedObject.h" />
+    <ClInclude Include="TextureStore.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +99,14 @@
     <Text Include="Text.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="char1a.bmp" />
+    <Image Include="char2a.bmp" />
+    <Image Include="char2b.bmp" />
+    <Image Include="char3a.bmp" />
+    <Image Include="dirt.bmp" />
+    <Image Include="flower.bmp" />
+    <Image Include="grass.bmp" />
+    <Image Include="rock.bmp" />
     <Image Include="smiley.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

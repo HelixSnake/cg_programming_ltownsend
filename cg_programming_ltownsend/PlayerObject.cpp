@@ -1,6 +1,7 @@
-#include "TexturedObject.h"
+#include "PlayerObject.h"
 
-TexturedObject::TexturedObject(){
+PlayerObject::PlayerObject(){
+	animTime = 0;
 	objectState = NULL;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
@@ -9,64 +10,103 @@ TexturedObject::TexturedObject(){
 	SetScale(vec3(1));
 	numIndices = 6;
 	LoadTriangles(2, 0, GL_TRIANGLES);
-	textureID = TextureStore::AddTexture("smiley.bmp");
+	textureIDs[0] = TextureStore::AddTexture("char1a.bmp");
+	textureIDs[1] = TextureStore::AddTexture("char1b.bmp");
+	textureIDs[2] = TextureStore::AddTexture("char2a.bmp");
+	textureIDs[3] = TextureStore::AddTexture("char2b.bmp");
+	textureIDs[4] = TextureStore::AddTexture("char3a.bmp");
+	textureIDs[5] = TextureStore::AddTexture("char3b.bmp");
+	textureIDs[6] = TextureStore::AddTexture("char4a.bmp");
+	textureIDs[7] = TextureStore::AddTexture("char4b.bmp");
+	currentTextureID = textureIDs[0];
 }
 
-TexturedObject::~TexturedObject(){
+PlayerObject::~PlayerObject(){
 	
 }
 
-void TexturedObject::SetPosition(vec3 position){
+void PlayerObject::SetPosition(vec3 position){
 	this->position = position;
 }
 
-void TexturedObject::SetScale(vec3 scale){
+void PlayerObject::SetScale(vec3 scale){
 	this->scale = scale;
 }
 
-void TexturedObject::SetTexture(GLuint unTextureID){
-	this->textureID = unTextureID;
-}
-
-GLuint TexturedObject::GetTexture(){
-	return textureID;
-}
-
-vec3 TexturedObject::GetPosition(){
+vec3 PlayerObject::GetPosition(){
 	return position;
 }
 
-float TexturedObject::GetLeftX(){
+float PlayerObject::GetLeftX(){
 	return leftX;
 }
 
-float TexturedObject::GetRightX(){
+float PlayerObject::GetRightX(){
 	return rightX;
 }
 
-float TexturedObject::GetTopY(){
+float PlayerObject::GetTopY(){
 	return topY;
 }
 
-float TexturedObject::GetBottomY(){
+float PlayerObject::GetBottomY(){
 	return bottomY;
 }
 
-void TexturedObject::Update(const float& deltaTime){
+void PlayerObject::Update(const float& deltaTime){
+	float animLength = 0.1;
+	animTime += deltaTime;
+	//if (animTime > animLength * 2) animTime -= animLength * 2;
+	int animFrame = (int)floor(animTime / animLength) % 2;
+	if (animFrame > 1)
+	{
+		int asdfas = 2;
+	}
 	leftX = position.x - scale.x;
 	rightX = position.x + scale.x;
 	topY = position.y + scale.y;
 	bottomY = position.y - scale.y;
+	float move_speed = 5;
+	vec3 movevec;
+	movevec.x = 0;
+	movevec.y = 0;
+	movevec.z = 0;
+	if (glfwGetKey(window, GLFW_KEY_LEFT))
+	{
+		currentTextureID = textureIDs[2 + animFrame];
+		movevec.x -= 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT))
+	{
+		currentTextureID = textureIDs[6 + animFrame];
+		movevec.x += 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP))
+	{
+		currentTextureID = textureIDs[4 + animFrame];
+		movevec.y += 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN))
+	{
+		currentTextureID = textureIDs[0 + animFrame];
+		movevec.y -= 1;
+	}
+	if (movevec.x != 0 || movevec.y != 0)
+	{
+		movevec = glm::normalize(movevec);
+	}
+
+	position += movevec * move_speed * deltaTime;
 }
 
-void TexturedObject::Render(const Camera& camera){
+void PlayerObject::Render(const Camera& camera){
 	mat4 modelMatrix = Render();
 	mat4 MVPMatrix = camera.projectionMatrix * camera.viewMatrix * modelMatrix;
 
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 }
 
-void TexturedObject::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode){
+void PlayerObject::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode){
 
 	static const GLfloat vertexBuffer[] = {
 		-1.0f, 1.0f,  0.0f,
@@ -98,20 +138,20 @@ void TexturedObject::LoadTriangles(const GLuint& perRow, const GLuint& perColumn
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBuffer), uvBuffer, GL_STATIC_DRAW);
 }
 
-void TexturedObject::SaveObjectState(char *message){
+void PlayerObject::SaveObjectState(char *message){
 	if(objectState == NULL)
-		objectState = (TexturedObject*)malloc(sizeof(*this));
+		objectState = (PlayerObject*)malloc(sizeof(*this));
 
 	*objectState = *this;
 	puts(message);
 }
 
-void TexturedObject::LoadObjectState(char *message){
+void PlayerObject::LoadObjectState(char *message){
 	*this = *objectState;
 	puts(message);
 }
 
-mat4 TexturedObject::Render(){
+mat4 PlayerObject::Render(){
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
@@ -140,7 +180,7 @@ mat4 TexturedObject::Render(){
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	
-	glBindTexture(GL_TEXTURE_2D, this->textureID);
+	glBindTexture(GL_TEXTURE_2D, this->currentTextureID);
 
 	//Every object starts off with an identity matrix...
 	/*mat4 objectMatrix = mat4(1.0f);

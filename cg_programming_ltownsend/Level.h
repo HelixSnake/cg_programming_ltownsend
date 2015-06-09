@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "BitmapReader.h"
+#include "TextureStore.h"
 #include <fstream>
 #include <iostream>
 #pragma once

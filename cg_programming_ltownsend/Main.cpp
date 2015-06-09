@@ -23,6 +23,7 @@ int InitWindowFailed(){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old open gl...
 
 	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, APP_NAME, NULL, NULL);
+
 	
 	if(window == NULL){
 		fprintf(stderr, "Failed to create/open GLFW window.\n");
@@ -287,6 +288,12 @@ int main(){
 	if(InitWindowFailed() | InitGlewFailed()){
 		return EXIT_WITH_ERROR;
 	}
+		
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LEQUAL);
+
+	glEnable (GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	GLuint vertexArrayID = 0;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -317,10 +324,11 @@ int main(){
 		// Game Update Code
 		float deltaTime = GetDeltaTime();
 
+		vec3 charpos = world.GetMainCharPos();
 		// Rendering Code
 		camera.viewMatrix = lookAt(
-			vec3(0, 0, 20),
-			vec3(0, 0, 0),
+			vec3(charpos.x, charpos.y, 10),
+			vec3(charpos.x, charpos.y, 0),
 			vec3(0, 1, 0)
 		);
 

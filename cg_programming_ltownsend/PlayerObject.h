@@ -1,15 +1,15 @@
 #include "Application.h"
-#include "TextureStore.h"
 #include "Object.h"
+#include "TextureStore.h"
 
 #pragma once
 
-class TexturedObject : public Object{
+class PlayerObject : public Object{
 
 	public:
-		TexturedObject();
+		PlayerObject();
 
-		virtual ~TexturedObject();
+		virtual ~PlayerObject();
 		virtual void Update(const float& deltaTime);
 		virtual void Render(const Camera& camera);
 
@@ -30,14 +30,17 @@ class TexturedObject : public Object{
 		void LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode);
 
 	protected:
-		TexturedObject* objectState;
+		PlayerObject* objectState;
 
 	private:
+		static const int NUM_TEXTURE_IDS = 8;
 		float leftX, rightX, topY, bottomY;
 		mat4 Render();
 		GLuint numIndices;
 		GLuint vertexBufferID;
 		GLuint uvBufferID;
 		GLenum renderMode;
-		GLuint textureID;
+		GLuint currentTextureID;
+		GLuint textureIDs[NUM_TEXTURE_IDS];
+		float animTime;
 };

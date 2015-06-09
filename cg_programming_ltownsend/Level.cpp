@@ -70,7 +70,7 @@ void Level::GenerateImageIDs()
 {
 	for (int i = 0; i < _numTileImages; i++)
 	{
-		_tileImageIDs[i] = BitmapReader::loadBMP_custom(_tileImages[i]);
+		_tileImageIDs[i] = TextureStore::AddTexture(_tileImages[i]);
 	}
 }
 GLuint Level::GetImageID(int index)
