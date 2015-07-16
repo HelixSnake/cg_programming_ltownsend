@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "CubeObject.h"
 #include "TexturedObject.h"
 #include "PlayerObject.h"
 #include "Level.h"
@@ -14,12 +15,9 @@ class World{
 		void ResetWorld();
 		void Update(const float& deltaTime);
 		void Render(const Camera& camera);
-		vec3 GetMainCharPos();
 		
 	private:
 		int resetKey;
-		GLuint numObjects;
-		Object** objects;
-		Object* mainChar;
-		Level* level;
+		CubeObject** _cubes;
+		int _numCubes;
 };

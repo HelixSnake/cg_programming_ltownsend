@@ -2,41 +2,21 @@
 
 World::World(){
 
-	level = new Level("Text.txt");
-	//level->Print();
-	level->GenerateImageIDs();
-
-	int levelHeight = level->GetHeight();
-	int levelWidth = level->GetWidth();
-	float levelCenterX = levelWidth / 2;
-	float levelCenterY = levelHeight / 2;
-	objects = new Object*[numObjects = levelHeight * levelWidth];
-	for (int y = 0; y < levelHeight; ++y)
+	_numCubes = 5;
+	_cubes = new CubeObject*[_numCubes];
+	for (int i = 0; i < _numCubes; i++)
 	{
-		for (int x = 0; x < levelWidth; ++x)
-		{
-			objects[y * levelWidth + x] = new TexturedObject();
-			((TexturedObject*)objects[y * levelWidth + x])->SetPosition(vec3((x - levelCenterX)*2+1, (y - levelCenterY)*-2-1, 0));
-			((TexturedObject*)objects[y * levelWidth + x])->SetScale(vec3(1, 1, 1));
-			((TexturedObject*)objects[y * levelWidth + x])->SetTexture(level->GetImageID(level->GetTile(x,y)));
-			cout << ((TexturedObject*)objects[y * levelWidth + x])->GetTexture() << " ";
-		}
-		cout << endl;
+		_cubes[i] = new CubeObject();
+		_cubes[i]->SetPosition(vec3(i*3 - (_numCubes / 5 * 3) - 3, 0, 0));
 	}
-	mainChar = new PlayerObject();
-	((PlayerObject*)mainChar)->SetPosition(vec3(0, 0, 0));
-	((PlayerObject*)mainChar)->SetScale(vec3(1, 1, 1));
-
 	//SaveObjectStates();
 
 	resetKey = GLFW_KEY_SPACE;
 }
 
 World::~World(){
-	delete[] objects;
-	objects = NULL;
-	delete level;
-	level = NULL;
+	delete[] _cubes;
+	_cubes = NULL;
 }
 
 void World::LoadObjectStates(){
@@ -58,22 +38,16 @@ void World::ResetWorld(){
 }
 
 void World::Update(const float& deltaTime){
-	for(GLuint i = 0; i < numObjects; ++i){
-		objects[i]->Update(deltaTime);
+	for (int i = 0; i < _numCubes; i++)
+	{
+		_cubes[i]->Update(deltaTime);
 	}
-	((PlayerObject*)mainChar)->Update(deltaTime);
 	ResetWorld();
 }
 
 void World::Render(const Camera& camera){
-	for(GLuint i = 0; i < numObjects; ++i){
-		objects[i]->Render(camera);
+	for (int i = 0; i < _numCubes; i++)
+	{
+		_cubes[i]->Render(camera);
 	}
-	mainChar->Render(camera);
-	mainChar->Render(camera);
-}
-
-vec3 World::GetMainCharPos()
-{
-	return mainChar->GetPosition();
 }

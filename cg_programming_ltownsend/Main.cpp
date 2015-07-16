@@ -289,11 +289,8 @@ int main(){
 		return EXIT_WITH_ERROR;
 	}
 		
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
-
-	glEnable (GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
 	GLuint vertexArrayID = 0;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -301,7 +298,7 @@ int main(){
 
 	//Create and compile glsl program from shaders...
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
-	GLuint programID = LoadShaders("TexturedVertexShader.vertexshader", "TexturedFragmentShader.fragmentshader");
+	GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
 
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
@@ -318,17 +315,22 @@ int main(){
 	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
 	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
 
+	float camx = 0;
+	float camy = 0;
+
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (glfwGetKey(window, GLFW_KEY_LEFT)) --camx;
+		if (glfwGetKey(window, GLFW_KEY_RIGHT)) ++camx;
+		if (glfwGetKey(window, GLFW_KEY_UP)) --camy;
+		if (glfwGetKey(window, GLFW_KEY_DOWN)) ++camy;
 		// Game Update Code
 		float deltaTime = GetDeltaTime();
-
-		vec3 charpos = world.GetMainCharPos();
 		// Rendering Code
 		camera.viewMatrix = lookAt(
-			vec3(charpos.x, charpos.y, 10),
-			vec3(charpos.x, charpos.y, 0),
+			vec3(camx, camy, 10),
+			vec3(0, 0, 0),
 			vec3(0, 1, 0)
 		);
 

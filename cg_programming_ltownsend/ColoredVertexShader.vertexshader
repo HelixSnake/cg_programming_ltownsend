@@ -7,7 +7,10 @@ in vec3 color;
 
 out vec3 colorV;
 
+//model view projection matrix...
+uniform mat4 MVP;
+
 void main(){
 	colorV = color;
-	gl_Position = vec4(model_space_pos, 1);
+	gl_Position = MVP * vec4(model_space_pos, 1);
 }
