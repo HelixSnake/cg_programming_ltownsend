@@ -1,62 +1,62 @@
-#include "Object.h"
+#include "ModeledObject.h"
 
-Object::Object(){
+ModeledObject::ModeledObject(){
 	objectState = NULL;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
 	SetPosition(vec3(0));
 	SetScale(vec3(1));
 	numIndices = 6;
-	LoadTriangles(2, 0, GL_TRIANGLES);
+	LoadTriangles();
 }
 
-Object::~Object(){
+ModeledObject::~ModeledObject(){
 	
 }
 
-void Object::SetPosition(vec3 position){
+void ModeledObject::SetPosition(vec3 position){
 	this->position = position;
 }
 
-void Object::SetScale(vec3 scale){
+void ModeledObject::SetScale(vec3 scale){
 	this->scale = scale;
 }
 
-vec3 Object::GetPosition(){
+vec3 ModeledObject::GetPosition(){
 	return position;
 }
 
-float Object::GetLeftX(){
+float ModeledObject::GetLeftX(){
 	return leftX;
 }
 
-float Object::GetRightX(){
+float ModeledObject::GetRightX(){
 	return rightX;
 }
 
-float Object::GetTopY(){
+float ModeledObject::GetTopY(){
 	return topY;
 }
 
-float Object::GetBottomY(){
+float ModeledObject::GetBottomY(){
 	return bottomY;
 }
 
-void Object::Update(const float& deltaTime){
+void ModeledObject::Update(const float& deltaTime){
 	leftX = position.x - scale.x;
 	rightX = position.x + scale.x;
 	topY = position.y + scale.y;
 	bottomY = position.y - scale.y;
 }
 
-void Object::Render(const Camera& camera){
+void ModeledObject::Render(const Camera& camera){
 	mat4 modelMatrix = Render();
 	mat4 MVPMatrix = camera.projectionMatrix * camera.viewMatrix * modelMatrix;
 
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 }
 
-void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode){
+void ModeledObject::LoadTriangles(){
 
 	static const GLfloat vertexBuffer[] = {
 		-1.0f, 1.0f,  0.0f,
@@ -67,26 +67,26 @@ void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const 
 	
 	numIndices = 4;
 
-	this->renderMode = renderMode;
+	this->renderMode = GL_TRIANGLES;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer), vertexBuffer, GL_STATIC_DRAW);
 }
 
-void Object::SaveObjectState(char *message){
+void ModeledObject::SaveObjectState(char *message){
 	if(objectState == NULL)
-		objectState = (Object*)malloc(sizeof(*this));
+		objectState = (ModeledObject*)malloc(sizeof(*this));
 
 	*objectState = *this;
 	puts(message);
 }
 
-void Object::LoadObjectState(char *message){
+void ModeledObject::LoadObjectState(char *message){
 	*this = *objectState;
 	puts(message);
 }
 
-mat4 Object::Render(){
+mat4 ModeledObject::Render(){
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 
