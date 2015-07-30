@@ -112,6 +112,7 @@ void TexturedObject::LoadObjectState(char *message){
 }
 
 mat4 TexturedObject::Render(){
+
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);

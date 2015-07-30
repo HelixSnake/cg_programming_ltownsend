@@ -3,6 +3,8 @@
 #include "TexturedObject.h"
 #include "PlayerObject.h"
 #include "Level.h"
+#include "ModeledObject.h"
+#include "MeshLoader.h"
 
 class World{
 
@@ -18,6 +20,6 @@ class World{
 		
 	private:
 		int resetKey;
-		CubeObject** _cubes;
-		int _numCubes;
+		ModeledObject* _modeledobject;
+		TexturedObject* _texturedobject;
 };

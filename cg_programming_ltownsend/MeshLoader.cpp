@@ -69,7 +69,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 			++currentNormal;
 		}
 		if (strcmp(lineHeader, "f") == 0){
-			int **cFP = &faces[numFaces];
+			int **cFP = &faces[currentFace];
 			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[2], &(*cFP)[3], &(*cFP)[4], &(*cFP)[5], &(*cFP)[6], &(*cFP)[7], &(*cFP)[8]);
 			if (matches != 9){
 				printf("File can't be read by our simple parser :( Try exporting with other options\n");
@@ -91,6 +91,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 			if (vertIndex >= numVerts) {
 				delete verts, uvs, normals;
 				delete[] faces;
+				delete mesh->_tris;
 				return false;
 			}
 			crntMeshTri->vertices[j] = verts[vertIndex];
@@ -99,6 +100,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 			if (uvIndex >= numUVs) {
 				delete verts, uvs, normals;
 				delete[] faces;
+				delete mesh->_tris;
 				return false;
 			}
 			crntMeshTri->uvs[j] = uvs[uvIndex];
@@ -107,6 +109,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 			if (normalIndex >= numNormals) {
 				delete verts, uvs, normals;
 				delete[] faces;
+				delete mesh->_tris;
 				return false;
 			}
 			crntMeshTri->normals[j] = normals[normalIndex];

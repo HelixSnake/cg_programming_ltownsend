@@ -101,6 +101,8 @@
     <None Include="ColoredVertexShader.vertexshader" />
     <None Include="TexturedFragmentShader.fragmentshader" />
     <None Include="TexturedVertexShader.vertexshader" />
+    <None Include="FlagTexturedVertexShader.vertexshader" />
+    <None Include="FlagTexturedFragmentShader.fragmentshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />

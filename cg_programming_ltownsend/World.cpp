@@ -1,22 +1,17 @@
 #include "World.h"
 
 World::World(){
-
-	_numCubes = 5;
-	_cubes = new CubeObject*[_numCubes];
-	for (int i = 0; i < _numCubes; i++)
-	{
-		_cubes[i] = new CubeObject();
-		_cubes[i]->SetPosition(vec3(i*3 - (_numCubes / 5 * 3) - 3, 0, 0));
-	}
+	Mesh mesh;
+	MeshLoader::loadMesh(&mesh, "arceus.obj");
+	_modeledobject = new ModeledObject(&mesh);
+	//_texturedobject = new TexturedObject();
 	//SaveObjectStates();
 
 	resetKey = GLFW_KEY_SPACE;
 }
 
 World::~World(){
-	delete[] _cubes;
-	_cubes = NULL;
+	delete _modeledobject;
 }
 
 void World::LoadObjectStates(){
@@ -38,16 +33,11 @@ void World::ResetWorld(){
 }
 
 void World::Update(const float& deltaTime){
-	for (int i = 0; i < _numCubes; i++)
-	{
-		_cubes[i]->Update(deltaTime);
-	}
+	_modeledobject->Update(deltaTime);
 	ResetWorld();
 }
 
 void World::Render(const Camera& camera){
-	for (int i = 0; i < _numCubes; i++)
-	{
-		_cubes[i]->Render(camera);
-	}
+	_modeledobject->Render(camera);
+	//_texturedobject->Render(camera);
 }
