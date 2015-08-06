@@ -290,6 +290,8 @@ int main(){
 	}
 		
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
 
 	GLuint vertexArrayID = 0;
@@ -298,7 +300,7 @@ int main(){
 
 	//Create and compile glsl program from shaders...
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
-	GLuint programID = LoadShaders("FlagTexturedVertexShader.vertexshader", "FlagTexturedFragmentShader.fragmentshader");
+	GLuint programID = LoadShaders("LitTexturedVertexShader.vertexshader", "LitTexturedFragmentShader.fragmentshader");
 
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
@@ -307,12 +309,15 @@ int main(){
 	GLuint quadID = LoadQuad();
 	GLuint quadcolorID = LoadQuadColors();
 
+	GLuint DirLightID = glGetUniformLocation(programID, "lightDir");
+
 	glUseProgram(programID);
 
 	Camera camera;
 	World world;
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
 	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
+	camera.MVMatrixID = glGetUniformLocation(programID, "MV");
 	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
 
 	glm::vec3 position = glm::vec3( 0, 0, 5 );
@@ -379,6 +384,10 @@ int main(){
 			position+direction,
 			up
 		);
+
+		vec3 lightDir = vec3(vec4(0, 0, 1, 0));
+
+		glUniform3f(DirLightID, lightDir.x, lightDir.y, lightDir.z);
 
 		world.Update(deltaTime);
 		world.Render(camera);

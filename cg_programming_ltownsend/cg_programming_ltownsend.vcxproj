@@ -102,6 +102,8 @@
     <None Include="ColoredVertexShader.vertexshader" />
     <None Include="FlagTexturedFragmentShader.fragmentshader" />
     <None Include="FlagTexturedVertexShader.vertexshader" />
+    <None Include="LitTexturedFragmentShader.fragmentshader" />
+    <None Include="LitTexturedVertexShader.vertexshader" />
     <None Include="TexturedFragmentShader.fragmentshader" />
     <None Include="TexturedVertexShader.vertexshader" />
   </ItemGroup>

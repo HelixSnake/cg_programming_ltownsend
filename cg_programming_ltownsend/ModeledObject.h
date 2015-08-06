@@ -7,7 +7,7 @@
 class ModeledObject{
 
 	public:
-		ModeledObject(Mesh* mesh);
+		ModeledObject(Mesh* mesh, char* texture);
 
 		virtual ~ModeledObject();
 		virtual void Update(const float& deltaTime);
@@ -29,16 +29,18 @@ class ModeledObject{
 	protected:
 		ModeledObject* objectState;
 		vec3 position, scale;
+		mat4 rotMatrix;
 
 	private:
 		Mesh* loadedMesh;
 		float leftX, rightX, topY, bottomY;
-		mat4 Render();
+		void Render();
 		GLuint numVertInds;
 		GLuint numUVInds;
 		GLuint uvBufferID;
 		GLuint numNormalInds;
 		GLuint vertexBufferID;
+		GLuint normalBufferID;
 		GLenum renderMode;
 		GLuint textureID;
 };

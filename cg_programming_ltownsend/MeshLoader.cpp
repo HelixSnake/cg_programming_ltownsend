@@ -1,5 +1,23 @@
 #include "MeshLoader.h"
 
+int FindFaceType(char* lineBuffer){
+	int sBuff;
+	int matches;
+	matches = sscanf(lineBuffer, "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff);
+	if (matches == 12)return 12;
+	matches = sscanf(lineBuffer, "%d/%d %d/%d %d/%d %d/%d\n", &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff);
+	if (matches == 8)return 8;
+	matches = sscanf(lineBuffer, "%d %d %d %d\n", &sBuff, &sBuff, &sBuff, &sBuff);
+	if (matches == 4)return 4;
+	matches = sscanf(lineBuffer, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff);
+	if (matches == 9) return 9;
+	matches = sscanf(lineBuffer, "%d/%d %d/%d %d/%d\n", &sBuff, &sBuff, &sBuff, &sBuff, &sBuff, &sBuff);
+	if (matches == 6) return 6;
+	matches = sscanf(lineBuffer, "%d %d %d\n", &sBuff, &sBuff, &sBuff);
+	if (matches == 3) return 3;
+	return -1;
+}
+
 bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 {
 	int numVerts = 0;
@@ -14,7 +32,8 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 	}
 	while (true){
 		char linebuffer[1024];
-		char lineHeader[256];
+		char faceFormatBuffer[1024];
+		char lineHeader[1024];
 		int res = fscanf(file, "%s", lineHeader);
 		if (res == EOF) break;
 		if ( strcmp( lineHeader, "v" ) == 0 ){
@@ -31,7 +50,10 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 		}
 		if ( strcmp( lineHeader, "f" ) == 0 ){
 			++numFaces;
-			fgets(linebuffer, 1024, file); 
+			fgets(faceFormatBuffer, 1024, file);
+			int faceformat = FindFaceType(faceFormatBuffer);
+			if (faceformat == 4 || faceformat == 8 || faceformat == 12) ++numFaces;
+			//fgets(linebuffer, 1024, file); 
 		}
 	}
 	rewind(file);
@@ -49,8 +71,11 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 	int currentNormal = 0;
 	int currentFace = 0;
 
+	int faceType = 0;
+
 	while (true){
 		char lineHeader[256];
+		char faceFormatBuffer[1024];
 		int res = fscanf(file, "%s", lineHeader);
 		if (res == EOF) break;
 		if (strcmp(lineHeader, "v") == 0){
@@ -70,12 +95,48 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path)
 		}
 		if (strcmp(lineHeader, "f") == 0){
 			int **cFP = &faces[currentFace];
-			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[2], &(*cFP)[3], &(*cFP)[4], &(*cFP)[5], &(*cFP)[6], &(*cFP)[7], &(*cFP)[8]);
-			if (matches != 9){
-				printf("File can't be read by our simple parser :( Try exporting with other options\n");
+			/*for (int i = 0; i < 9; i++){
+				(*cFP)[i] = 0;
+			}*/
+			memset(*cFP, 0, 9*sizeof(int));
+			fgets(faceFormatBuffer, 1024, file);
+			faceType = FindFaceType(faceFormatBuffer);
+			if (faceType == -1){
+				printf("Faces formatting error");
 				delete verts, uvs, normals;
 				delete[] faces;
 				return false;
+			}
+
+			if (faceType == 3){
+				sscanf(faceFormatBuffer, "%d %d %d\n", &(*cFP)[0], &(*cFP)[3], &(*cFP)[6]);
+			}
+			else if (faceType == 6){
+				sscanf(faceFormatBuffer, "%d/%d %d/%d %d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[3], &(*cFP)[4], &(*cFP)[6], &(*cFP)[7]);
+			}
+			else if (faceType == 9){
+				sscanf(faceFormatBuffer, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[2], &(*cFP)[3], &(*cFP)[4], &(*cFP)[5], &(*cFP)[6], &(*cFP)[7], &(*cFP)[8]);
+			}
+			else if (faceType == 4){
+				sscanf(faceFormatBuffer, "%d %d %*d %d\n", &(*cFP)[0], &(*cFP)[3], &(*cFP)[6]);
+				++currentFace;
+				cFP = &faces[currentFace];
+				memset(*cFP, 0, 9*sizeof(int));
+				sscanf(faceFormatBuffer, "%*d %d %d %d\n", &(*cFP)[0], &(*cFP)[3], &(*cFP)[6]);
+			}
+			else if (faceType == 8){
+				sscanf(faceFormatBuffer, "%d/%d %d/%d %*d/%*d %d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[3], &(*cFP)[4], &(*cFP)[6], &(*cFP)[7]);
+				++currentFace;
+				cFP = &faces[currentFace];
+				memset(*cFP, 0, 9*sizeof(int));
+				sscanf(faceFormatBuffer, "%*d/%*d %d/%d %d/%d %d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[3], &(*cFP)[4], &(*cFP)[6], &(*cFP)[7]);
+			}
+			else if (faceType == 12){
+				sscanf(faceFormatBuffer, "%d/%d/%d %d/%d/%d %*d/%*d/%*d %d/%d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[2], &(*cFP)[3], &(*cFP)[4], &(*cFP)[5], &(*cFP)[6], &(*cFP)[7], &(*cFP)[8]);
+				++currentFace;
+				cFP = &faces[currentFace];
+				memset(*cFP, 0, 9*sizeof(int));
+				sscanf(faceFormatBuffer, "%*d/%*d/%*d %d/%d/%d %d/%d/%d %d/%d/%d\n", &(*cFP)[0], &(*cFP)[1], &(*cFP)[2], &(*cFP)[3], &(*cFP)[4], &(*cFP)[5], &(*cFP)[6], &(*cFP)[7], &(*cFP)[8]);
 			}
 			++currentFace;
 		}

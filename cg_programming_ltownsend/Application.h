@@ -45,5 +45,6 @@ extern bool activeRef;
 
 struct Camera{
 	GLuint MVPMatrixID;
+	GLuint MVMatrixID;
 	mat4 projectionMatrix, viewMatrix, MVPMatrix;
 };

@@ -1,16 +1,17 @@
 #include "ModeledObject.h"
 
-ModeledObject::ModeledObject(Mesh* mesh){
+ModeledObject::ModeledObject(Mesh* mesh, char* texture){
 	objectState = NULL;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
 	SetPosition(vec3(0));
 	SetScale(vec3(1));
+	rotMatrix = mat4(1.0f);
 	numVertInds = mesh->_numTris * 9;
 	numUVInds = mesh->_numTris * 6;
 	numNormalInds = mesh->_numTris * 9;
 	loadedMesh = mesh;
-	textureID = TextureStore::AddTexture("arceus.bmp");
+	textureID = TextureStore::AddTexture(texture);
 	LoadTriangles();
 }
 
@@ -54,10 +55,16 @@ void ModeledObject::Update(const float& deltaTime){
 }
 
 void ModeledObject::Render(const Camera& camera){
-	mat4 modelMatrix = Render();
+	mat4 identityMatrix = mat4(1.0f);
+	mat4 translateMatrix = translate(identityMatrix, position);
+	mat4 modelMatrix = glm::scale(translateMatrix, scale);
+	modelMatrix = rotMatrix * modelMatrix;
+
+	glUniformMatrix4fv(camera.MVMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
 	mat4 MVPMatrix = camera.projectionMatrix * camera.viewMatrix * modelMatrix;
 
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
+	Render();
 }
 
 void ModeledObject::LoadTriangles(){
@@ -83,6 +90,17 @@ void ModeledObject::LoadTriangles(){
 		}
 	}
 
+	GLfloat *normalBuffer = new GLfloat[numNormalInds];
+	for (int i = 0; i < loadedMesh->_numTris; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			normalBuffer[i*9 + j*3 + 0] = loadedMesh->_tris[i].normals[j].x;
+			normalBuffer[i*9 + j*3 + 1] = loadedMesh->_tris[i].normals[j].y;
+			normalBuffer[i*9 + j*3 + 2] = loadedMesh->_tris[i].normals[j].z;
+		}
+	}
+
 	this->renderMode = GL_TRIANGLES;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
@@ -91,8 +109,14 @@ void ModeledObject::LoadTriangles(){
 	glGenBuffers(1, &uvBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*numUVInds, uvBuffer, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &normalBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*numNormalInds, normalBuffer, GL_STATIC_DRAW);
+
 	delete uvBuffer;
 	delete vertexBuffer;
+	delete normalBuffer;
 }
 
 void ModeledObject::SaveObjectState(char *message){
@@ -108,10 +132,15 @@ void ModeledObject::LoadObjectState(char *message){
 	puts(message);
 }
 
-mat4 ModeledObject::Render(){
+void ModeledObject::Render(){
 	
+	
+	glBindTexture(GL_TEXTURE_2D, this->textureID);
+
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 
 	glVertexAttribPointer(
@@ -134,9 +163,21 @@ mat4 ModeledObject::Render(){
 		(void*)0	//Array buffer offset...
 	);
 
+	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
+
+	glVertexAttribPointer(
+		2,			//attribute layout
+		3,			//Elements in array
+		GL_FLOAT,	//Each element is of type float
+		GL_FALSE,	//Normalized?
+		0,			//Stride...
+		(void*)0	//Array buffer offset...
+	);
+
 	glDrawArrays(renderMode, 0, numVertInds);	//GL_TRIANGLE_STRIP or GL_TRIANGLES
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 	
 	glBindTexture(GL_TEXTURE_2D, this->textureID);
 
@@ -144,12 +185,6 @@ mat4 ModeledObject::Render(){
 	/*mat4 objectMatrix = mat4(1.0f);
 	mat4 identityMatrix = glm::scale(objectMatrix, scale);	
 	mat4 modelMatrix = translate(identityMatrix, position);*/
-
-	mat4 identityMatrix = mat4(1.0f);
-	mat4 translateMatrix = translate(identityMatrix, position);
-	mat4 modelMatrix = glm::scale(translateMatrix, scale);
-
-	return modelMatrix;
 }
 
 //static mat4 Render(GLuint vertexBuffer, const vec3& position, const vec3& scale);

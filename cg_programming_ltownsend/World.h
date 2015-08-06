@@ -21,5 +21,6 @@ class World{
 	private:
 		int resetKey;
 		ModeledObject* _modeledobject;
+		ModeledObject* _modeledobject2;
 		TexturedObject* _texturedobject;
 };
