@@ -1,0 +1,35 @@
+#version 330 core
+ 
+// Interpolated values from the vertex shaders
+in vec2 UV;
+in vec3 normal;
+in vec3 newLightDir;
+ 
+// Ouput data
+out vec4 color;
+ 
+// Values that stay constant for the whole mesh.
+uniform sampler2D myTextureSampler;
+uniform vec3 cameraVec;
+ 
+void main(){
+ 
+    // Output color = color of the texture at the specified UV
+	float intensity = dot(-newLightDir,normal);
+
+	intensity = intensity * 3.5;
+	intensity = floor(intensity);
+	intensity = intensity / 3;
+
+	vec3 reflectionVector = newLightDir - dot(newLightDir, normal) * 2 * normal;
+	float specintensity = clamp(dot(-cameraVec, normalize(reflectionVector)), 0, 1);
+	
+	specintensity = pow(specintensity, 20.0);
+
+	specintensity = specintensity * 4;
+	specintensity = floor(specintensity);
+	specintensity = specintensity / 4;
+
+    color = texture( myTextureSampler, UV ).rgba * intensity;
+	color = color + vec4(1,1,1,1) * specintensity * intensity;
+}

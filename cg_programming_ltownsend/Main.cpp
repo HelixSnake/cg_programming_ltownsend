@@ -300,7 +300,7 @@ int main(){
 
 	//Create and compile glsl program from shaders...
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
-	GLuint programID = LoadShaders("LitTexturedVertexShader.vertexshader", "LitTexturedFragmentShader.fragmentshader");
+	GLuint programID = LoadShaders("ToonTexturedVertexShader.vertexshader", "ToonTexturedFragmentShader.fragmentshader");
 
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
@@ -310,6 +310,7 @@ int main(){
 	GLuint quadcolorID = LoadQuadColors();
 
 	GLuint DirLightID = glGetUniformLocation(programID, "lightDir");
+	GLuint CamVecID = glGetUniformLocation(programID, "cameraVec");
 
 	glUseProgram(programID);
 
@@ -385,9 +386,10 @@ int main(){
 			up
 		);
 
-		vec3 lightDir = vec3(vec4(0, 0, 1, 0));
+		vec3 lightDir = vec3(vec4(0, 0, -1, 0));
 
 		glUniform3f(DirLightID, lightDir.x, lightDir.y, lightDir.z);
+		glUniform3f(CamVecID, direction.x, direction.y, direction.z);
 
 		world.Update(deltaTime);
 		world.Render(camera);

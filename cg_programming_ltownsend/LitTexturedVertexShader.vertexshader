@@ -17,7 +17,7 @@ uniform vec3 lightDir;
  
 void main(){
 	
-	newLightDir = (normalize(MV * vec4(lightDir, 0))).xyz;
+	newLightDir = (normalize(vec4(lightDir, 0))).xyz;
 	normal = normalize(MV * vec4(vertexNormal,0)).xyz;
 
     // Output position of the vertex, in clip space : MVP * position

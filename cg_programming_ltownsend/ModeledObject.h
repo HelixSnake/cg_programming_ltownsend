@@ -15,6 +15,8 @@ class ModeledObject{
 
 		void SetPosition(vec3 position);
 		void SetScale(vec3 scale);
+		void SetRotationMatrix(mat4 rotation);
+		void AddRotation(vec3 axis, float angle);
 
 		vec3 GetPosition();
 		float GetLeftX();

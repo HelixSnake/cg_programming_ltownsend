@@ -27,6 +27,15 @@ void ModeledObject::SetScale(vec3 scale){
 	this->scale = scale;
 }
 
+void ModeledObject::SetRotationMatrix(mat4 rotation){
+	this->rotMatrix = rotation;
+}
+
+
+void ModeledObject::AddRotation(vec3 axis, float angle){
+	rotMatrix = glm::rotate(rotMatrix, angle, axis);
+}
+
 vec3 ModeledObject::GetPosition(){
 	return position;
 }

@@ -16,8 +16,5 @@ void main(){
     // Output color = color of the texture at the specified UV
 	float intensity = dot(newLightDir,normal);
 
-	intensity = intensity * 5.9;
-	intensity = floor(intensity);
-	intensity = intensity / 5;
     color = texture( myTextureSampler, UV ).rgba * intensity;
 }

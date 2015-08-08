@@ -63,7 +63,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>glfw\lib;glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)glfw\lib;$(SolutionDir)\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -106,6 +106,8 @@
     <None Include="LitTexturedVertexShader.vertexshader" />
     <None Include="TexturedFragmentShader.fragmentshader" />
     <None Include="TexturedVertexShader.vertexshader" />
+    <None Include="ToonTexturedFragmentShader.fragmentshader" />
+    <None Include="ToonTexturedVertexShader.vertexshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
