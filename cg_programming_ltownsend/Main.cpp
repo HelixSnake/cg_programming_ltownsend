@@ -125,6 +125,61 @@ GLuint LoadShaders(const char *vertex_file_path, const char *fragment_file_path)
 	return programID;
 }
 
+GLuint AddGeometryShader(GLuint programID, const char *geometry_file_path){
+	GLuint geometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
+
+	//Read in shader code here...
+	string geometryShaderCode = "";
+	ifstream geometryShaderStream(geometry_file_path, ios::in);
+	if(geometryShaderStream.is_open()){
+		string line = "";
+		while(getline(geometryShaderStream, line)){
+			geometryShaderCode += "\n" + line;
+		}
+		geometryShaderStream.close();
+	}
+
+	GLint result = GL_FALSE;
+	int infoLogLength = 0;
+
+	//Compile shaders here...
+	//Compile Geometry Shader...
+	printf("Compiling geometry shader: %s\n", geometry_file_path);
+	char const *geometrySourcePointer = geometryShaderCode.c_str();
+	glShaderSource(geometryShaderID, 1, &geometrySourcePointer, NULL);
+	glCompileShader(geometryShaderID);
+
+	//Check Geometry Shader...
+	glGetShaderiv(geometryShaderID, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(geometryShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+	char* geometryShaderErrorMessage = new char[infoLogLength];
+	glGetShaderInfoLog(geometryShaderID, infoLogLength, NULL, &geometryShaderErrorMessage[0]);
+	fprintf(stdout, "%s\n", &geometryShaderErrorMessage[0]);
+
+	//Link Program...
+	fprintf(stdout, "Linking program\n");
+	glAttachShader(programID, geometryShaderID);
+	glLinkProgram(programID);
+
+	//Check the progam...
+	glGetProgramiv(programID, GL_LINK_STATUS, &result);
+	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+	char *programErrorMessage = new char[glm::max(infoLogLength, int(1))];
+	glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
+	fprintf(stdout, "%s\n", &programErrorMessage[0]);
+
+	glDeleteShader(geometryShaderID);
+	
+	delete(programErrorMessage);
+	programErrorMessage = NULL;
+	
+	delete(geometryShaderErrorMessage);
+	geometryShaderErrorMessage = NULL;
+
+	return programID;
+}
+
 int InitGlewFailed(){
 	glewExperimental = true;	//Has to do with core profile.
 	int init = (int)glewInit();
@@ -301,7 +356,7 @@ int main(){
 	//Create and compile glsl program from shaders...
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
 	GLuint programID = LoadShaders("ToonTexturedVertexShader.vertexshader", "ToonTexturedFragmentShader.fragmentshader");
-
+	AddGeometryShader(programID, "ToonTexturedGeometryShader.geomshader");
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -334,6 +389,7 @@ int main(){
 	float elapsedTime = 0;
 
 	do{
+		glClearColor(0.0, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Game Update Code
 		float deltaTime = GetDeltaTime();

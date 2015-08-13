@@ -4,6 +4,7 @@
 in vec2 UV;
 in vec3 normal;
 in vec3 newLightDir;
+flat in int isOutline;
  
 // Ouput data
 out vec4 color;
@@ -11,25 +12,29 @@ out vec4 color;
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
 uniform vec3 cameraVec;
+uniform vec3 lightDir;
  
 void main(){
  
     // Output color = color of the texture at the specified UV
-	float intensity = dot(-newLightDir,normal);
+
+	float intensity = dot(-lightDir,normal);
 
 	intensity = intensity * 3.5;
 	intensity = floor(intensity);
-	intensity = intensity / 3;
+	intensity = clamp(intensity / 3, 0.2, 1);
 
-	vec3 reflectionVector = newLightDir - dot(newLightDir, normal) * 2 * normal;
+	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
 	float specintensity = clamp(dot(-cameraVec, normalize(reflectionVector)), 0, 1);
 	
 	specintensity = pow(specintensity, 20.0);
 
-	specintensity = specintensity * 4;
+	specintensity = specintensity * 3;
 	specintensity = floor(specintensity);
-	specintensity = specintensity / 4;
+	specintensity = specintensity / 3;
 
     color = texture( myTextureSampler, UV ).rgba * intensity;
 	color = color + vec4(1,1,1,1) * specintensity * intensity;
+
+	color = color * (1 - isOutline);
 }

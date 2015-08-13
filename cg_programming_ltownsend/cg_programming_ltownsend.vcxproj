@@ -107,6 +107,7 @@
     <None Include="TexturedFragmentShader.fragmentshader" />
     <None Include="TexturedVertexShader.vertexshader" />
     <None Include="ToonTexturedFragmentShader.fragmentshader" />
+    <None Include="ToonTexturedGeometryShader.geomshader" />
     <None Include="ToonTexturedVertexShader.vertexshader" />
   </ItemGroup>
   <ItemGroup>

@@ -107,6 +107,7 @@
     <None Include="LitTexturedVertexShader.vertexshader" />
     <None Include="ToonTexturedFragmentShader.fragmentshader" />
     <None Include="ToonTexturedVertexShader.vertexshader" />
+    <None Include="ToonTexturedGeometryShader.geomshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
