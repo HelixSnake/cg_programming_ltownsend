@@ -10,11 +10,23 @@ out vec4 color;
  
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
+uniform vec3 lightDir;
+uniform vec3 cameraVec;
  
 void main(){
  
+ 
     // Output color = color of the texture at the specified UV
-	float intensity = dot(newLightDir,normal);
+	float intensity = dot(-lightDir,normal);
+	intensity = clamp(intensity, 0, 1);
+
+	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
+	float specintensity = clamp(dot(-cameraVec, normalize(reflectionVector)), 0, 1);
+	
+	specintensity = pow(specintensity, 20.0);
+
+	specintensity *= intensity;
 
     color = texture( myTextureSampler, UV ).rgba * intensity;
+	color = color * (1 - specintensity) + vec4(1,1,1,1) * specintensity;
 }

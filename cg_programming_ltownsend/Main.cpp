@@ -355,8 +355,10 @@ int main(){
 
 	//Create and compile glsl program from shaders...
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
-	GLuint programID = LoadShaders("ToonTexturedVertexShader.vertexshader", "ToonTexturedFragmentShader.fragmentshader");
-	AddGeometryShader(programID, "ToonTexturedGeometryShader.geomshader");
+	//GLuint programID = LoadShaders("ToonTexturedOutlinedVertexShader.vertexshader", "ToonTexturedOutlinedFragmentShader.fragmentshader");
+	//AddGeometryShader(programID, "ToonTexturedOutlinedGeometryShader.geomshader");
+
+	GLuint programID = LoadShaders("LitTexturedVertexShader.vertexshader", "LitTexturedFragmentShader.fragmentshader");
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 

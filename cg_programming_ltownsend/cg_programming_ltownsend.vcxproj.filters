@@ -105,9 +105,9 @@
     <None Include="FlagTexturedFragmentShader.fragmentshader" />
     <None Include="LitTexturedFragmentShader.fragmentshader" />
     <None Include="LitTexturedVertexShader.vertexshader" />
-    <None Include="ToonTexturedFragmentShader.fragmentshader" />
-    <None Include="ToonTexturedVertexShader.vertexshader" />
-    <None Include="ToonTexturedGeometryShader.geomshader" />
+    <None Include="ToonTexturedOutlinedFragmentShader.fragmentshader" />
+    <None Include="ToonTexturedOutlinedGeometryShader.geomshader" />
+    <None Include="ToonTexturedOutlinedVertexShader.vertexshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
