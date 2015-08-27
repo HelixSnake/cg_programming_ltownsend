@@ -3,30 +3,51 @@
 // Interpolated values from the vertex shaders
 in vec2 UV;
 in vec3 normal;
-in vec3 newLightDir;
  
 // Ouput data
 out vec4 color;
  
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
+uniform vec3 objectEmissiveColor = vec3(0,0,0);
+uniform float objectGlow = 0.0f;
+uniform vec3 lightAmbientColor = vec3(0,0,0);
+uniform float objectReflectance = 0;
 uniform vec3 lightDir;
+uniform vec3 lightDiffuseColor = vec3(1,1,1);
+uniform vec3 lightSpecColor = vec3(1,1,1);
+uniform float objectSpecFalloff = 20.0;
+uniform vec3 objectSpecColor = vec3(1,1,1);
 uniform vec3 cameraVec;
  
 void main(){
  
- 
-    // Output color = color of the texture at the specified UV
-	float intensity = dot(-lightDir,normal);
-	intensity = clamp(intensity, 0, 1);
+	// EMISSIVE COLOR
+	vec3 emissiveColor = objectEmissiveColor * objectGlow;
+
+	// AMBIENT COLOR
+	vec3 ambientColor = lightAmbientColor * objectReflectance;
+
+	// DIFFUSE COLOR
+	float diffuseIntensity = dot(-lightDir,normal);
+	diffuseIntensity = clamp(diffuseIntensity, 0, 1);
+
+	vec3 diffuseColor = texture( myTextureSampler, UV ).rgb * lightDiffuseColor * diffuseIntensity;
+
+	// SPECULAR COLOR
+	//vec3 halfVector = normalize(normalize(-lightDir) + normalize(-cameraVec));
+	//float specintensity = clamp(dot(halfVector, normal), 0, 1);
 
 	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
 	float specintensity = clamp(dot(-cameraVec, normalize(reflectionVector)), 0, 1);
-	
-	specintensity = pow(specintensity, 20.0);
 
-	specintensity *= intensity;
+	specintensity = pow(specintensity, objectSpecFalloff);
 
-    color = texture( myTextureSampler, UV ).rgba * intensity;
-	color = color * (1 - specintensity) + vec4(1,1,1,1) * specintensity;
+	specintensity *= diffuseIntensity;
+
+	vec3 specularColor = lightSpecColor * objectSpecColor * specintensity;
+
+	// TOTAL COLOR
+    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 0);
+
 }

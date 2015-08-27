@@ -46,5 +46,13 @@ extern bool activeRef;
 struct Camera{
 	GLuint MVPMatrixID;
 	GLuint MVMatrixID;
+	GLuint fwdVecID;
 	mat4 projectionMatrix, viewMatrix, MVPMatrix;
+};
+
+struct DirectionLight{
+	GLuint directionID;
+	GLuint diffuseColorID;
+	GLuint specColorID;
+	vec3 diffuseColor, specColor, direction;
 };

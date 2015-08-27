@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Mesh.h"
 #include "TextureStore.h"
+#include "Material.h"
 
 #pragma once
 
@@ -13,6 +14,8 @@ class ModeledObject{
 		virtual void Update(const float& deltaTime);
 		virtual void Render(const Camera& camera);
 
+		void SetShaderSetID(GLuint setID);
+		void SendUniformVariable(GLuint* variableAddress, string uniformString);
 		void SetPosition(vec3 position);
 		void SetScale(vec3 scale);
 		void SetRotationMatrix(mat4 rotation);
@@ -45,4 +48,5 @@ class ModeledObject{
 		GLuint normalBufferID;
 		GLenum renderMode;
 		GLuint textureID;
+		Material* material;
 };

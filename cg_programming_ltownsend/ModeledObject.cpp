@@ -1,7 +1,7 @@
 #include "ModeledObject.h"
 
 ModeledObject::ModeledObject(Mesh* mesh, char* texture){
-	objectState = NULL;
+	objectState = nullptr;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
 	SetPosition(vec3(0));
@@ -13,10 +13,25 @@ ModeledObject::ModeledObject(Mesh* mesh, char* texture){
 	loadedMesh = mesh;
 	textureID = TextureStore::AddTexture(texture);
 	LoadTriangles();
+	material = nullptr;
 }
 
 ModeledObject::~ModeledObject(){
 	
+}
+
+void ModeledObject::SetShaderSetID(GLuint setID){
+	if (material != nullptr)
+	{
+		delete material;
+	}
+	material = new Material(setID);
+}
+
+void ModeledObject::SendUniformVariable(GLuint* variableAddress, string uniformString){
+	if (material != nullptr){
+	material->AddUniformVariable(variableAddress, uniformString);
+	}
 }
 
 void ModeledObject::SetPosition(vec3 position){
@@ -64,6 +79,9 @@ void ModeledObject::Update(const float& deltaTime){
 }
 
 void ModeledObject::Render(const Camera& camera){
+	if (material != nullptr){
+		material->LoadMaterial();
+	}
 	mat4 identityMatrix = mat4(1.0f);
 	mat4 translateMatrix = translate(identityMatrix, position);
 	mat4 modelMatrix = glm::scale(translateMatrix, scale);
