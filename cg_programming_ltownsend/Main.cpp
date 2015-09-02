@@ -374,7 +374,7 @@ int main(){
 	DirectionLight light;
 	world.setCamera(&camera);
 	world.setLight(&light);
-	world.SetDefaultShaderSet(programID);
+	world.SetDefaultShaderSet(toonShaderID);
 	world.AddShaderSet("default", programID);
 	world.AddShaderSet("toon", toonShaderID);
 	world.ApplyShaders();
@@ -458,6 +458,7 @@ int main(){
 
 		glUniform3f(light.directionID, light.direction.x, light.direction.y, light.direction.z);
 		glUniform3f(camera.fwdVecID, direction.x, direction.y, direction.z);
+		camera.fwdVec = direction;
 
 		world.Update(deltaTime);
 		world.Render(camera);

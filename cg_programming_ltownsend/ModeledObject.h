@@ -12,6 +12,7 @@ class ModeledObject{
 
 		virtual ~ModeledObject();
 		virtual void Update(const float& deltaTime);
+		virtual void LoadMaterial();
 		virtual void Render(const Camera& camera);
 
 		void SetShaderSetID(GLuint setID);

@@ -44,9 +44,11 @@ extern GLint shaderStatus;
 extern bool activeRef;
 
 struct Camera{
+	GLuint projMatrixID;
 	GLuint MVPMatrixID;
 	GLuint MVMatrixID;
 	GLuint fwdVecID;
+	vec3 fwdVec;
 	mat4 projectionMatrix, viewMatrix, MVPMatrix;
 };
 

@@ -13,8 +13,8 @@ void Material::RemoveUniformVariable(GLuint* variableAddress){
 }
 
 void Material::LoadMaterial(){
+	glUseProgram(_shaderSetID);
 	for (map<GLuint*, string>::iterator iter = _uniformVariables.begin(); iter != _uniformVariables.end(); ++iter){
 		*iter->first = glGetUniformLocation(_shaderSetID, iter->second.data());
 	}
-	glUseProgram(_shaderSetID);
 }

@@ -78,14 +78,17 @@ void ModeledObject::Update(const float& deltaTime){
 	bottomY = position.y - scale.y;
 }
 
-void ModeledObject::Render(const Camera& camera){
+void ModeledObject::LoadMaterial(){
 	if (material != nullptr){
 		material->LoadMaterial();
 	}
+}
+
+void ModeledObject::Render(const Camera& camera){
 	mat4 identityMatrix = mat4(1.0f);
-	mat4 translateMatrix = translate(identityMatrix, position);
-	mat4 modelMatrix = glm::scale(translateMatrix, scale);
-	modelMatrix = rotMatrix * modelMatrix;
+	mat4 scaleMatrix = glm::scale(identityMatrix, scale);
+	mat4 translationMatrix = translate(identityMatrix, position);
+	mat4 modelMatrix = translationMatrix * rotMatrix * scaleMatrix;
 
 	glUniformMatrix4fv(camera.MVMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
 	mat4 MVPMatrix = camera.projectionMatrix * camera.viewMatrix * modelMatrix;

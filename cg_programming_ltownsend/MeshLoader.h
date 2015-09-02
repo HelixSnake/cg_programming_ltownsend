@@ -6,5 +6,5 @@ using namespace glm;
 
 class MeshLoader{
 public:
-	static bool loadMesh(Mesh *mesh, const char* path);
+	static bool loadMesh(Mesh *mesh, const char* path, bool smoothNormals = false);
 };
