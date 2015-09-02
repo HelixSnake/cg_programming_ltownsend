@@ -272,6 +272,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 				}
 			}
 
+			delete vertAttachStartIndices;
 			delete vertAttachCurrentIndices;
 			delete vertNormalAttachments;
 			delete faceNormals;
