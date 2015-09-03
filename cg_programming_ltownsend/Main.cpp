@@ -357,8 +357,10 @@ int main(){
 	//GLuint programID = LoadShaders("ColoredVertexShader.vertexshader", "ColoredFragmentShader.fragmentshader");
 	GLuint toonShaderID = LoadShaders("ToonTexturedOutlinedVertexShader.vertexshader", "ToonTexturedOutlinedFragmentShader.fragmentshader");
 	AddGeometryShader(toonShaderID, "ToonTexturedOutlinedGeometryShader.geomshader");
+	GLuint iridescentShaderID = LoadShaders("IridescentVertexShader.vertexshader", "IridescentFragmentShader.fragmentshader");
 
 	GLuint programID = LoadShaders("LitTexturedVertexShader.vertexshader", "LitTexturedFragmentShader.fragmentshader");
+	GLuint advShaderID = LoadShaders("LitTexturedNormalSpec.vertexshader", "LitTexturedNormalSpec.fragmentshader");
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -377,6 +379,8 @@ int main(){
 	world.SetDefaultShaderSet(toonShaderID);
 	world.AddShaderSet("default", programID);
 	world.AddShaderSet("toon", toonShaderID);
+	world.AddShaderSet("iridescent", iridescentShaderID);
+	world.AddShaderSet("advShader", advShaderID);
 	world.ApplyShaders();
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
 	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
@@ -455,7 +459,8 @@ int main(){
 			position+direction,
 			up
 		);
-
+		
+		light.direction = direction;
 		glUniform3f(light.directionID, light.direction.x, light.direction.y, light.direction.z);
 		glUniform3f(camera.fwdVecID, direction.x, direction.y, direction.z);
 		camera.fwdVec = direction;

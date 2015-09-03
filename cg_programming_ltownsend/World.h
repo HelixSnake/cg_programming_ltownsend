@@ -4,6 +4,7 @@
 #include "PlayerObject.h"
 #include "Level.h"
 #include "ModeledObject.h"
+#include "AdvModeledObject.h"
 #include "MeshLoader.h"
 
 class World{
@@ -27,7 +28,7 @@ class World{
 	private:
 		int resetKey;
 		static const int NUM_OBJECTS = 2;
-		ModeledObject* _modeledobject[NUM_OBJECTS];
+		AdvModeledObject* _modeledobject[NUM_OBJECTS];
 		TexturedObject* _texturedobject;
 		map<string, GLuint> _shadersets;
 		GLuint _defaultShaderSet;

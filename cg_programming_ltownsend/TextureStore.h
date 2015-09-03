@@ -4,7 +4,7 @@
 
 #pragma once
 
-static class TextureStore
+class TextureStore
 {
 public:
 	static GLuint AddTexture(char* path);

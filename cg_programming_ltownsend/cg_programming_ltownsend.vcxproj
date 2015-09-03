@@ -68,6 +68,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdvModeledObject.cpp" />
     <ClCompile Include="BitmapReader.cpp" />
     <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdvModeledObject.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="BitmapReader.h" />
     <ClInclude Include="CubeObject.h" />
@@ -104,7 +106,11 @@
     <None Include="ColoredVertexShader.vertexshader" />
     <None Include="FlagTexturedFragmentShader.fragmentshader" />
     <None Include="FlagTexturedVertexShader.vertexshader" />
+    <None Include="IridescentVertexShader.vertexshader" />
+    <None Include="IridescentFragmentShader.fragmentshader" />
     <None Include="LitTexturedFragmentShader.fragmentshader" />
+    <None Include="LitTexturedNormalSpec.fragmentshader" />
+    <None Include="LitTexturedNormalSpec.vertexshader" />
     <None Include="LitTexturedVertexShader.vertexshader" />
     <None Include="TexturedFragmentShader.fragmentshader" />
     <None Include="TexturedVertexShader.vertexshader" />
@@ -114,17 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="char1a.bmp" />
-    <Image Include="char2a.bmp" />
-    <Image Include="char2b.bmp" />
-    <Image Include="char3a.bmp" />
-    <Image Include="dirt.bmp" />
-    <Image Include="flower.bmp" />
-    <Image Include="grass.bmp" />
-    <Image Include="rock.bmp" />
-    <Image Include="smiley.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

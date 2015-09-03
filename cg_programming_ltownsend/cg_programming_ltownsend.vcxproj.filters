@@ -54,6 +54,9 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AdvModeledObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -95,6 +98,9 @@
     <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AdvModeledObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BasicVertexShader.vertexshader">
@@ -114,37 +120,12 @@
     <None Include="ToonTexturedOutlinedFragmentShader.fragmentshader" />
     <None Include="ToonTexturedOutlinedGeometryShader.geomshader" />
     <None Include="ToonTexturedOutlinedVertexShader.vertexshader" />
+    <None Include="IridescentVertexShader.vertexshader" />
+    <None Include="IridescentFragmentShader.fragmentshader" />
+    <None Include="LitTexturedNormalSpec.vertexshader" />
+    <None Include="LitTexturedNormalSpec.fragmentshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="smiley.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="char3a.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="char1a.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="char2a.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="char2b.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="dirt.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="flower.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="grass.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="rock.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

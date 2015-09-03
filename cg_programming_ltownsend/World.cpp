@@ -3,15 +3,15 @@
 World::World(){
 	Mesh mesh;
 	Mesh mesh2;
-	MeshLoader::loadMesh(&mesh, "stanford_bunny.obj");
+	MeshLoader::loadMesh(&mesh, "head2.obj");
 	MeshLoader::loadMesh(&mesh2, "stanford_bunny_original.obj", true);
-	_modeledobject[1] = new ModeledObject(&mesh2, "grasstex.bmp");
-	_modeledobject[0] = new ModeledObject(&mesh, "grasstex.bmp");
+	_modeledobject[0] = new AdvModeledObject(&mesh, "colors.bmp", "colors.bmp", "normal01.bmp");
+	_modeledobject[1] = new AdvModeledObject(&mesh2, "colors.bmp", "grasstex.bmp", "normal01.bmp");
 
 	_modeledobject[1]->SetPosition(vec3(0, 8, 0));
 	//TODO: fix normals for scaled objects
 	_modeledobject[0]->SetScale(vec3(1,1,1));
-	_modeledobject[1]->SetScale(vec3(10,10,10));
+	_modeledobject[1]->SetScale(vec3(20,20,20));
 	//_texturedobject = new TexturedObject();
 	//SaveObjectStates();
 
@@ -24,8 +24,8 @@ World::~World(){
 }
 
 void World::ApplyShaders(){
-	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("toon"));
-	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("toon"));
+	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("advShader"));
+	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("iridescent"));
 	for (int i = 0; i < NUM_OBJECTS; i++)
 	{
 		_modeledobject[i]->SendUniformVariable(&_camera->projMatrixID, "Proj");
@@ -71,7 +71,7 @@ void World::ResetWorld(){
 void World::Update(const float& deltaTime){
 	_modeledobject[0]->Update(deltaTime);
 	_modeledobject[1]->Update(deltaTime);
-	_modeledobject[1]->AddRotation(vec3(0, 1, 0), deltaTime * 100);
+	//_modeledobject[0]->AddRotation(vec3(0, 1, 0), deltaTime * 100);
 	ResetWorld();
 }
 

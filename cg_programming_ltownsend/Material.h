@@ -8,6 +8,7 @@ public:
 	void AddUniformVariable(GLuint* variableAddress, string uniformVar);
 	void RemoveUniformVariable(GLuint* variableAddress);
 	void LoadMaterial();
+	GLuint GetShaderID() {return _shaderSetID;};
 private:
 	GLuint _shaderSetID;
 	map<GLuint*, string> _uniformVariables;
