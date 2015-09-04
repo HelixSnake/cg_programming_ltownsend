@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "TextureStore.h"
 #include "Material.h"
+#include <map>
 
 #pragma once
 
@@ -14,6 +15,11 @@ class AdvModeledObject{
 		virtual void Update(const float& deltaTime);
 		virtual void LoadMaterial();
 		virtual void Render(const Camera& camera);
+
+		void AddFloatVar(string name, float value);
+		void AddVec3Var(string name, vec3 value);
+		void RemoveFloatVar(string name);
+		void RemoveVec3Var(string name);
 
 		void SetShaderSetID(GLuint setID);
 		void SendUniformVariable(GLuint* variableAddress, string uniformString);
@@ -54,4 +60,9 @@ class AdvModeledObject{
 		GLuint specMapID;
 		GLuint normMapID;
 		Material* material;
+
+		map<string, pair<float, GLuint>> var_floats;
+		map<string, pair<vec3, GLuint>> var_vec3s;
+		map<string, float> var_floats_defaults;
+		map<string, vec3> var_vec3s_defaults;
 };

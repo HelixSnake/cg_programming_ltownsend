@@ -18,3 +18,4 @@ void Material::LoadMaterial(){
 		*iter->first = glGetUniformLocation(_shaderSetID, iter->second.data());
 	}
 }
+

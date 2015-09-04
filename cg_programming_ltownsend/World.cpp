@@ -3,15 +3,25 @@
 World::World(){
 	Mesh mesh;
 	Mesh mesh2;
-	MeshLoader::loadMesh(&mesh, "head2.obj");
-	MeshLoader::loadMesh(&mesh2, "stanford_bunny_original.obj", true);
-	_modeledobject[0] = new AdvModeledObject(&mesh, "colors.bmp", "colors.bmp", "normal01.bmp");
-	_modeledobject[1] = new AdvModeledObject(&mesh2, "colors.bmp", "grasstex.bmp", "normal01.bmp");
+	MeshLoader::loadMesh(&mesh, "sphere.obj");
+	MeshLoader::loadMesh(&mesh2, "sphere.obj");
+	_modeledobject[0] = new AdvModeledObject(&mesh, "EarthTex.bmp", "EarthSpec.bmp", "EarthNormal.bmp");
+	_modeledobject[1] = new AdvModeledObject(&mesh2, "MoonTex.bmp", "MoonSpec.bmp", "MoonNormal.bmp");
+	_modeledobject[0]->AddFloatVar("objectSpecFalloff", 40.0);
+	_modeledobject[0]->AddFloatVar("normalMapHeightMult", 2.0);
+	_modeledobject[1]->AddFloatVar("normalMapHeightMult", 2.0);
+	_modeledobject[0]->AddVec3Var("objectSpecColor", vec3(0.6, 0.6, 0.4));
 
-	_modeledobject[1]->SetPosition(vec3(0, 8, 0));
+	_modeledobject[1]->SetPosition(vec3(0, 3, 0));
 	//TODO: fix normals for scaled objects
 	_modeledobject[0]->SetScale(vec3(1,1,1));
-	_modeledobject[1]->SetScale(vec3(20,20,20));
+	_modeledobject[1]->SetScale(vec3(0.1,0.1,0.1));
+	{
+		mat4 identity = mat4(1.0);
+		vec3 vec = vec3(0,0,1);
+		float angle = -23;
+		_modeledobject[0]->SetRotationMatrix(glm::rotate(identity, angle, vec));
+	}
 	//_texturedobject = new TexturedObject();
 	//SaveObjectStates();
 
@@ -25,7 +35,7 @@ World::~World(){
 
 void World::ApplyShaders(){
 	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("advShader"));
-	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("iridescent"));
+	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	for (int i = 0; i < NUM_OBJECTS; i++)
 	{
 		_modeledobject[i]->SendUniformVariable(&_camera->projMatrixID, "Proj");
@@ -71,7 +81,10 @@ void World::ResetWorld(){
 void World::Update(const float& deltaTime){
 	_modeledobject[0]->Update(deltaTime);
 	_modeledobject[1]->Update(deltaTime);
-	//_modeledobject[0]->AddRotation(vec3(0, 1, 0), deltaTime * 100);
+	float angle = 23.0 / 180 * 3.14;
+	vec3 axis = vec3(0,sin(angle),-cos(angle));
+	_modeledobject[0]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
+	_modeledobject[1]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
 	ResetWorld();
 }
 

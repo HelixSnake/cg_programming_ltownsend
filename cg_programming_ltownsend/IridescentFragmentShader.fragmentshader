@@ -21,6 +21,7 @@ uniform vec3 objectSpecColor = vec3(1,1,1);
 uniform vec3 cameraVec;
 uniform mat4 Proj;
 uniform mat4 MVP;
+uniform mat4 MV;
  
 vec3 RGBtoHSV(vec3 color);
 vec3 HSVtoRGB(vec3 color);
@@ -42,11 +43,11 @@ void main(){
 	//vec3 halfVector = normalize(normalize(-lightDir) + normalize(-cameraVec));
 	//float specintensity = max(dot(halfVector, normal), 0);
 
-	vec3 cameraPos = vec3(Proj[3].x, Proj[3].y, Proj[3].z);
-	vec3 cameraToPointVec = normalize(cameraPos - (inverse(MVP) * gl_FragCoord).xyz);
+	//vec3 cameraPos = vec3(Proj[0].w, Proj[1].w, Proj[2].w);
+	//vec3 cameraToPointVec = normalize(cameraPos - (MV * inverse(MVP) * gl_FragCoord).xyz);
 
 	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
-	float lightReflection = dot(cameraToPointVec, normalize(reflectionVector));
+	float lightReflection = dot(-cameraVec, normalize(reflectionVector));
 	float specintensity = max(lightReflection, 0);
 
 	newTextureColor = RGBtoHSV(newTextureColor);

@@ -163,8 +163,11 @@ void ModeledObject::LoadObjectState(char *message){
 }
 
 void ModeledObject::Render(){
-	
-	
+
+	GLuint texLoc = glGetUniformLocation(material->GetShaderID(), "myTextureSampler");
+	glUniform1i(texLoc, 0);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->textureID);
 
 	glEnableVertexAttribArray(0);
@@ -208,8 +211,7 @@ void ModeledObject::Render(){
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-	
-	glBindTexture(GL_TEXTURE_2D, this->textureID);
+
 
 	//Every object starts off with an identity matrix...
 	/*mat4 objectMatrix = mat4(1.0f);

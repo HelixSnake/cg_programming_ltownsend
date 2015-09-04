@@ -398,7 +398,7 @@ int main(){
 	// Initial Field of View
 	float initialFoV = 45.0f;
  
-	float speed = 15.0f; // 3 units / second
+	float speed = 5.0f; // 3 units / second
 	float mouseSpeed = 0.05f;
 	float elapsedTime = 0;
 
@@ -460,7 +460,7 @@ int main(){
 			up
 		);
 		
-		light.direction = direction;
+		//light.direction = direction;
 		glUniform3f(light.directionID, light.direction.x, light.direction.y, light.direction.z);
 		glUniform3f(camera.fwdVecID, direction.x, direction.y, direction.z);
 		camera.fwdVec = direction;

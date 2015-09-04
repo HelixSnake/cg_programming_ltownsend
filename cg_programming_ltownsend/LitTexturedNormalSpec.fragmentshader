@@ -23,12 +23,13 @@ uniform vec3 lightDiffuseColor = vec3(1,1,1);
 uniform vec3 lightSpecColor = vec3(1,1,1);
 uniform float objectSpecFalloff = 20.0;
 uniform vec3 objectSpecColor = vec3(1,1,1);
+uniform float objectSpecIntensity = 1;
 uniform vec3 cameraVec;
  
 void main(){
 
-	mat3 tangentSpaceMat = mat3(tangent, -bitangent, normal);
-	vec3 newNormal = tangentSpaceMat * normalize(texture( NormalMap, UV ).rgb * 2.0 - 1.0);
+	mat3 tangentSpaceMat = mat3(tangent, bitangent, normal);
+	vec3 newNormal = normalize(tangentSpaceMat * normalize(texture( NormalMap, UV ).rgb * 2.0 - 1.0));
 	//vec3 newNormal = normalize(tangentSpaceMat * normalize(vec3(0,0,1)));
 	//vec3 newNormal = normal;
 	// EMISSIVE COLOR

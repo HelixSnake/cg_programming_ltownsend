@@ -22,17 +22,72 @@ AdvModeledObject::~AdvModeledObject(){
 	
 }
 
+void AdvModeledObject::AddFloatVar(string name, float value){
+	var_floats.insert(pair<string, pair<float, GLuint>>(name, pair<float, GLuint>(value, 0)));
+	if (material != nullptr){
+		if (var_floats_defaults.find(name) == var_floats_defaults.end()){
+			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
+			float defaultValue; 
+			glGetUniformfv(material->GetShaderID(), uniformLocation, &defaultValue);
+			var_floats_defaults.insert(pair<string, float>(name, defaultValue));
+		}
+		GLuint* varID = &var_floats.at(name).second;
+		material->AddUniformVariable(varID, name);
+	}
+}
+void AdvModeledObject::AddVec3Var(string name, vec3 value){
+	var_vec3s.insert(pair<string, pair<vec3, GLuint>>(name, pair<vec3, GLuint>(value, 0)));
+	if (material != nullptr){
+		if (var_vec3s_defaults.find(name) == var_vec3s_defaults.end()){
+			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
+			float defaultValue[3]; 
+			glGetUniformfv(material->GetShaderID(), uniformLocation, defaultValue);
+			var_vec3s_defaults.insert(pair<string, vec3>(name, vec3(defaultValue[0], defaultValue[1], defaultValue[2])));
+		}
+		GLuint* varID = &var_floats.at(name).second;
+		material->AddUniformVariable(varID, name);
+	}
+}
+void AdvModeledObject::RemoveFloatVar(string name){
+	var_floats.erase(name);
+}
+void AdvModeledObject::RemoveVec3Var(string name){
+	var_vec3s.erase(name);
+}
+
 void AdvModeledObject::SetShaderSetID(GLuint setID){
 	if (material != nullptr)
 	{
 		delete material;
 	}
 	material = new Material(setID);
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
+	{
+		string name = iter->first;
+		if (var_floats_defaults.find(name) == var_floats_defaults.end()){
+			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
+			float defaultValue; 
+			glGetUniformfv(material->GetShaderID(), uniformLocation, &defaultValue);
+			var_floats_defaults.insert(pair<string, float>(name, defaultValue));
+		}
+		material->AddUniformVariable(&iter->second.second, name);
+	}
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
+	{
+		string name = iter->first;
+		if (var_vec3s_defaults.find(name) == var_vec3s_defaults.end()){
+			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
+			float defaultValue[3]; 
+			glGetUniformfv(material->GetShaderID(), uniformLocation, defaultValue);
+			var_vec3s_defaults.insert(pair<string, vec3>(name, vec3(defaultValue[0], defaultValue[1], defaultValue[2])));
+		}
+		material->AddUniformVariable(&iter->second.second, name);
+	}
 }
 
 void AdvModeledObject::SendUniformVariable(GLuint* variableAddress, string uniformString){
 	if (material != nullptr){
-	material->AddUniformVariable(variableAddress, uniformString);
+		material->AddUniformVariable(variableAddress, uniformString);
 	}
 }
 
@@ -87,6 +142,14 @@ void AdvModeledObject::LoadMaterial(){
 }
 
 void AdvModeledObject::Render(const Camera& camera){
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
+	{
+		glUniform1f(iter->second.second, iter->second.first);
+	}
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
+	{
+		glUniform3f(iter->second.second, iter->second.first.x, iter->second.first.y, iter->second.first.z);
+	}
 	mat4 identityMatrix = mat4(1.0f);
 	mat4 scaleMatrix = glm::scale(identityMatrix, scale);
 	mat4 translationMatrix = translate(identityMatrix, position);
@@ -97,6 +160,15 @@ void AdvModeledObject::Render(const Camera& camera){
 
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 	Render();
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
+	{
+		glUniform1f(iter->second.second, var_floats_defaults.at(iter->first));
+	}
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
+	{
+		vec3 defaultvec = var_vec3s_defaults.at(iter->first);
+		glUniform3f(iter->second.second, defaultvec.x, defaultvec.y, defaultvec.z);
+	}
 }
 
 void AdvModeledObject::LoadTriangles(){
@@ -146,7 +218,7 @@ void AdvModeledObject::LoadTriangles(){
 		mat2x3 edgeMat = mat2x3(edge1, edge2);
 		tanBiTanMat = edgeMat * inverse(uvMat);
 		vec3 tangent = normalize(tanBiTanMat[0]);
-		vec3 bitangent = normalize(tanBiTanMat[1]);
+		vec3 bitangent = -normalize(tanBiTanMat[1]);
 		vec3 normal = loadedMesh->_tris[i].normals[0];
 
 		tangent = tangent - dot(normal, tangent) * normal;
@@ -206,6 +278,27 @@ void AdvModeledObject::LoadObjectState(char *message){
 }
 
 void AdvModeledObject::Render(){
+
+	GLuint texLoc = glGetUniformLocation(material->GetShaderID(), "myTextureSampler");
+	glUniform1i(texLoc, 0);
+
+	texLoc = glGetUniformLocation(material->GetShaderID(), "DiffuseMap");
+	glUniform1i(texLoc, 0);
+
+	texLoc = glGetUniformLocation(material->GetShaderID(), "SpecularMap");
+	glUniform1i(texLoc, 1);
+
+	texLoc = glGetUniformLocation(material->GetShaderID(), "NormalMap");
+	glUniform1i(texLoc, 2);
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specMapID);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, normMapID); 
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -274,23 +367,6 @@ void AdvModeledObject::Render(){
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(4);
-	GLuint texLoc = glGetUniformLocation(material->GetShaderID(), "DiffuseMap");
-	glUniform1i(texLoc, 0);
-
-	texLoc = glGetUniformLocation(material->GetShaderID(), "SpecularMap");
-	glUniform1i(texLoc, 1);
-
-	texLoc = glGetUniformLocation(material->GetShaderID(), "NormalMap");
-	glUniform1i(texLoc, 2);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specMapID);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, normMapID); 
 
 	//Every object starts off with an identity matrix...
 	/*mat4 objectMatrix = mat4(1.0f);
