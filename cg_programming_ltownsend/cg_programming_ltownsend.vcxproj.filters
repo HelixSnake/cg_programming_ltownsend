@@ -124,6 +124,9 @@
     <None Include="IridescentFragmentShader.fragmentshader" />
     <None Include="LitTexturedNormalSpec.vertexshader" />
     <None Include="LitTexturedNormalSpec.fragmentshader" />
+    <None Include="Atmosphere.fragmentshader" />
+    <None Include="Atmosphere.geomshader" />
+    <None Include="Atmosphere.vertexshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt" />

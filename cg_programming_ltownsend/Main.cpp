@@ -348,6 +348,9 @@ int main(){
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
+	glEnable( GL_BLEND );
+	glBlendEquation( GL_FUNC_ADD );
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	GLuint vertexArrayID = 0;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -358,6 +361,8 @@ int main(){
 	GLuint toonShaderID = LoadShaders("ToonTexturedOutlinedVertexShader.vertexshader", "ToonTexturedOutlinedFragmentShader.fragmentshader");
 	AddGeometryShader(toonShaderID, "ToonTexturedOutlinedGeometryShader.geomshader");
 	GLuint iridescentShaderID = LoadShaders("IridescentVertexShader.vertexshader", "IridescentFragmentShader.fragmentshader");
+	GLuint atmosphereShaderID = LoadShaders("Atmosphere.vertexshader", "Atmosphere.fragmentshader");
+	AddGeometryShader(atmosphereShaderID, "Atmosphere.geomshader");
 
 	GLuint programID = LoadShaders("LitTexturedVertexShader.vertexshader", "LitTexturedFragmentShader.fragmentshader");
 	GLuint advShaderID = LoadShaders("LitTexturedNormalSpec.vertexshader", "LitTexturedNormalSpec.fragmentshader");
@@ -381,6 +386,7 @@ int main(){
 	world.AddShaderSet("toon", toonShaderID);
 	world.AddShaderSet("iridescent", iridescentShaderID);
 	world.AddShaderSet("advShader", advShaderID);
+	world.AddShaderSet("atmosphere", atmosphereShaderID);
 	world.ApplyShaders();
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
 	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");

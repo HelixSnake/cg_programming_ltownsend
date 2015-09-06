@@ -47,6 +47,7 @@ struct Camera{
 	GLuint projMatrixID;
 	GLuint MVPMatrixID;
 	GLuint MVMatrixID;
+	GLuint viewMatrixID;
 	GLuint fwdVecID;
 	vec3 fwdVec;
 	mat4 projectionMatrix, viewMatrix, MVPMatrix;

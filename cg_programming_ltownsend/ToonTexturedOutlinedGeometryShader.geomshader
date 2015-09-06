@@ -13,11 +13,14 @@ flat out int isOutline;
 uniform mat4 MVP;
 uniform mat4 MV;
 uniform mat4 Proj;
+uniform mat4 View;
 
 void main() {
+	
+	mat4 normalMatrix = transpose(inverse(MV));
 
 	UV = UVg[0];
-	normal = normalize(MV * normalg[0]).xyz;
+	normal = normalize((normalMatrix * normalg[0]).xyz);
 	isOutline = 0;
 
 	gl_Position = gl_in[0].gl_Position;
@@ -25,7 +28,7 @@ void main() {
     EmitVertex();
 	
 	UV = UVg[1];
-	normal = normalize(MV * normalg[1]).xyz;
+	normal = normalize((normalMatrix * normalg[1]).xyz);
 	isOutline = 0;
 
     gl_Position = gl_in[1].gl_Position;
@@ -33,7 +36,7 @@ void main() {
     EmitVertex();
 	
 	UV = UVg[2];
-	normal = normalize(MV * normalg[2]).xyz;
+	normal = normalize((normalMatrix * normalg[2]).xyz);
 	isOutline = 0;
 
 	gl_Position = gl_in[2].gl_Position;
@@ -46,21 +49,21 @@ void main() {
 	normal = (normalg[0].xyz);
 	isOutline = 1;
 
-	gl_Position = MVP * gl_in[0].gl_Position + Proj * normalize(MV * normalg[0]) * 0.02;
+	gl_Position = MVP * gl_in[0].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[0]).xyz), 0) * 0.1;
     EmitVertex();
 	
 	UV = UVg[2];
 	normal = (normalg[2].xyz);
 	isOutline = 1;
 
-    gl_Position = MVP * gl_in[2].gl_Position + Proj * normalize(MV * normalg[2]) * 0.02;
+    gl_Position = MVP * gl_in[2].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[2]).xyz), 0) * 0.1;
     EmitVertex();
 	
 	UV = UVg[1];
 	normal = (normalg[1].xyz);
 	isOutline = 1;
 
-	gl_Position = MVP * gl_in[1].gl_Position + Proj * normalize(MV * normalg[1]) * 0.02;
+	gl_Position = MVP * gl_in[1].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[1]).xyz), 0) * 0.1;
     EmitVertex();
 
     EndPrimitive();

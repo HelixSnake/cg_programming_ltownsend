@@ -1,0 +1,32 @@
+#version 330 core
+ 
+// Interpolated values from the vertex shaders
+in vec2 UV;
+in vec3 normal;
+in vec4 position;
+ 
+// Ouput data
+out vec4 color;
+ 
+// Values that stay constant for the whole mesh.
+uniform sampler2D myTextureSampler;
+uniform vec3 cameraVec;
+uniform vec3 lightDir;
+uniform vec3 atmosphereColor = vec3(0,0,0);
+uniform mat4 MV;
+uniform mat4 MVP;
+uniform mat4 Proj;
+uniform mat4 View;
+ 
+void main(){
+
+	mat4 I_VP = inverse(Proj * View);
+ 
+	vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
+	vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
+
+	float alpha = max(dot(cameraToPointVec, normal), 0);
+
+    // Output color = color of the texture at the specified UV
+	color = vec4(atmosphereColor, alpha);
+}

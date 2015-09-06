@@ -59,6 +59,7 @@ void AdvModeledObject::SetShaderSetID(GLuint setID){
 	if (material != nullptr)
 	{
 		delete material;
+		material = nullptr;
 	}
 	material = new Material(setID);
 	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
@@ -279,6 +280,7 @@ void AdvModeledObject::LoadObjectState(char *message){
 
 void AdvModeledObject::Render(){
 
+	if (material == nullptr) return;
 	GLuint texLoc = glGetUniformLocation(material->GetShaderID(), "myTextureSampler");
 	glUniform1i(texLoc, 0);
 

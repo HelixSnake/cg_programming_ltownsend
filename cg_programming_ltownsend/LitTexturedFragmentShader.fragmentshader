@@ -48,6 +48,6 @@ void main(){
 	vec3 specularColor = lightSpecColor * objectSpecColor * specintensity;
 
 	// TOTAL COLOR
-    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 0);
+    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 1);
 
 }

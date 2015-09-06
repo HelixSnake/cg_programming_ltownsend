@@ -27,7 +27,7 @@ class World{
 		
 	private:
 		int resetKey;
-		static const int NUM_OBJECTS = 2;
+		static const int NUM_OBJECTS = 3;
 		AdvModeledObject* _modeledobject[NUM_OBJECTS];
 		TexturedObject* _texturedobject;
 		map<string, GLuint> _shadersets;

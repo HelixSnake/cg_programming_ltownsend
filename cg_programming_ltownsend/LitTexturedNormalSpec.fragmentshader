@@ -58,6 +58,6 @@ void main(){
 	vec3 specularColor = lightSpecColor * objectSpecColor * specintensity * texture( SpecularMap, UV ).rgb;
 
 	// TOTAL COLOR
-    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 0);
+    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 1);
 
 }

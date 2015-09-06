@@ -6,9 +6,8 @@ layout(location = 1) in vec2 vertexUV;
 layout(location = 2) in vec3 vertexNormal;
  
 // Output data ; will be interpolated for each fragment.
-out vec2 UV;
-out vec3 normal;
-out vec4 position;
+out vec2 UVg;
+out vec4 normalg;
  
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
@@ -16,14 +15,11 @@ uniform mat4 MV;
  
 void main(){
 	
-	mat4 normalMatrix = transpose(inverse(MV));
-
-	normal = normalize((normalMatrix * vec4(vertexNormal,0)).xyz);
+	normalg = vec4(vertexNormal,0);
 
     // Output position of the vertex, in clip space : MVP * position
-    gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
-	position = gl_Position;
+    gl_Position = vec4(vertexPosition_modelspace,1);
  
     // UV of the vertex. No special space for this one.
-    UV = vertexUV;
+    UVg = vertexUV;
 }
