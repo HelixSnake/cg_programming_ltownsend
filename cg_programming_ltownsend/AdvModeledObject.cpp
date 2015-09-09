@@ -21,7 +21,7 @@ AdvModeledObject::AdvModeledObject(Mesh* mesh){
 }
 
 AdvModeledObject::~AdvModeledObject(){
-	
+	if (material != nullptr) delete material;
 }
 
 void AdvModeledObject::SetFloatVar(string name, float value){

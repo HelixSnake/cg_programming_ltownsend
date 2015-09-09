@@ -22,22 +22,14 @@ int FindFaceType(char* lineBuffer){
 	return -1;
 }
 
-void GenerateNormals(Mesh *mesh)
-{
-	for (int i = 0; i < mesh->_numTris; i++) {
-		MeshTri *crntMeshTri = &mesh->_tris[i];
-		vec3 edge1 = crntMeshTri->vertices[2] - crntMeshTri->vertices[1];
-		vec3 edge2 = crntMeshTri->vertices[0] - crntMeshTri->vertices[1];
-		vec3 faceNormal = glm::normalize(cross(edge1, edge2));
-		for (int j = 0; j < 3; j++)
-		{
-			crntMeshTri->normals[j] = faceNormal;
-		}
+inline void DeleteDoubleIntArray(int **arrayStart, int numRows){
+	for (int i = 0; i < numRows; i++){
+		delete[] arrayStart[i];
 	}
+	delete[] arrayStart;
 }
 
-bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
-{
+bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals){
 	int numVerts = 0;
 	int numUVs = 0;
 	int numNormals = 0;
@@ -133,7 +125,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 			if (faceType == -1){
 				printf("Faces formatting error");
 				delete verts, uvs, normals;
-				delete[] faces;
+				DeleteDoubleIntArray(faces, numFaces);
 				return false;
 			}
 
@@ -272,10 +264,10 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 				}
 			}
 
-			delete vertAttachStartIndices;
-			delete vertAttachCurrentIndices;
-			delete vertNormalAttachments;
-			delete faceNormals;
+			delete[] vertAttachStartIndices;
+			delete[] vertAttachCurrentIndices;
+			delete[] vertNormalAttachments;
+			delete[] faceNormals;
 		}
 	}
 	
@@ -288,7 +280,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 			int vertIndex = faces[i][j * 3] - 1;
 			if (vertIndex >= numVerts) {
 				delete verts, uvs, normals;
-				delete[] faces;
+				DeleteDoubleIntArray(faces, numFaces);
 				delete mesh->_tris;
 				return false;
 			}
@@ -297,7 +289,7 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 			int uvIndex = faces[i][j * 3 + 1] - 1;
 			if (uvIndex >= numUVs) {
 				delete verts, uvs, normals;
-				delete[] faces;
+				DeleteDoubleIntArray(faces, numFaces);
 				delete mesh->_tris;
 				return false;
 			}
@@ -306,15 +298,15 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals)
 			int normalIndex = faces[i][j * 3 + 2] - 1;
 			if (normalIndex >= numNormals) {
 				delete verts, uvs, normals;
-				delete[] faces;
+				DeleteDoubleIntArray(faces, numFaces);
 				delete mesh->_tris;
 				return false;
 			}
 			crntMeshTri->normals[j] = normals[normalIndex];
 		}
 	}
-	delete verts, uvs, normals;
-	delete[] faces;
+	delete[] verts, uvs, normals;
+	DeleteDoubleIntArray(faces, numFaces);
 
 	return true;
 }

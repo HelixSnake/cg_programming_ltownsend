@@ -1,6 +1,11 @@
 #include "World.h"
 
+AdvModeledObject* _modeledobject[] = {nullptr};
+
 World::World(){
+	for (int i = 0; i < NUM_OBJECTS; i++){
+		_modeledobject[i] = nullptr;
+	}
 	Mesh mesh;
 	Mesh mesh2;
 	MeshLoader::loadMesh(&mesh, "sphere.obj");
@@ -10,10 +15,10 @@ World::World(){
 	_modeledobject[2] = new AdvModeledObject(&mesh);
 	_modeledobject[3] = new AdvModeledObject(&mesh);
 	_modeledobject[4] = new AdvModeledObject(&mesh2);
-	_modeledobject[5] = new AdvModeledObject(&mesh2);
+	//_modeledobject[5] = new AdvModeledObject(&mesh2);
 
-	for (int i = 0; i < NUM_OBJECTS; i++)
-	{
+	for (int i = 0; i < NUM_OBJECTS; i++){
+		if (_modeledobject[i] == nullptr) continue;
 		_modeledobject[i]->SetTexture("DiffuseMap", "white.bmp");
 		_modeledobject[i]->SetTexture("SpecularMap", "white.bmp");
 		_modeledobject[i]->SetTexture("NormalMap", "blankNormal.bmp");
@@ -34,7 +39,7 @@ World::World(){
 	_modeledobject[3]->SetFloatVar("objectTransparency", 0.6);
 
 	_modeledobject[4]->SetTexture("DiffuseMap", "EarthTex.bmp");
-	_modeledobject[5]->SetTexture("DiffuseMap", "grasstex.bmp");
+	//_modeledobject[5]->SetTexture("DiffuseMap", "grasstex.bmp");
 
 	_modeledobject[0]->SetFloatVar("objectSpecFalloff", 40.0);
 	_modeledobject[0]->SetFloatVar("normalMapHeightMult", 1.0);
@@ -48,7 +53,7 @@ World::World(){
 
 	_modeledobject[1]->SetPosition(vec3(0, 3, 0));
 	_modeledobject[4]->SetPosition(vec3(-3, 0, 0));
-	_modeledobject[5]->SetPosition(vec3(3, 0, 0));
+	//_modeledobject[5]->SetPosition(vec3(3, 0, 0));
 	//TODO: fix normals for scaled objects
 	_modeledobject[0]->SetScale(vec3(1,1,1));
 	_modeledobject[2]->SetScale(vec3(1,1,1));
@@ -68,8 +73,12 @@ World::World(){
 }
 
 World::~World(){
-	delete _modeledobject[0];
-	delete _modeledobject[1];
+	for (int i = 0; i < NUM_OBJECTS; i++){
+		if (_modeledobject[i] != nullptr)
+		{
+			delete _modeledobject[i];
+		}
+	}
 }
 
 void World::ApplyShaders(){
@@ -78,9 +87,10 @@ void World::ApplyShaders(){
 	_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
 	_modeledobject[3]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[4]->SetShaderSetID(this->LoadShaderSet("toon"));
-	_modeledobject[5]->SetShaderSetID(this->LoadShaderSet("iridescent"));
+	//_modeledobject[5]->SetShaderSetID(this->LoadShaderSet("iridescent"));
 	for (int i = 0; i < NUM_OBJECTS; i++)
 	{
+		if (_modeledobject[i] == nullptr) continue;
 		_modeledobject[i]->SendUniformVariable(&_camera->projMatrixID, "Proj");
 		_modeledobject[i]->SendUniformVariable(&_camera->MVMatrixID, "MV");
 		_modeledobject[i]->SendUniformVariable(&_camera->MVPMatrixID, "MVP");
@@ -135,6 +145,7 @@ void World::Update(const float& deltaTime){
 
 void World::Render(const Camera& camera){
 	for (int i = 0; i < NUM_OBJECTS; i++){
+		if (_modeledobject[i] == nullptr) continue;
 		_modeledobject[i]->LoadMaterial();
 		glUniform3f(_light->directionID, _light->direction.x, _light->direction.y, _light->direction.z);
 		glUniform3f(_camera->fwdVecID, _camera->fwdVec.x, _camera->fwdVec.y, _camera->fwdVec.z);
