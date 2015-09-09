@@ -1,6 +1,11 @@
 #include "AdvModeledObject.h"
 
-AdvModeledObject::AdvModeledObject(Mesh* mesh, char* texture, char* specMap, char* normMap){
+static const int GLSL_NUM_TEXTURES = 32;
+static const GLenum GLSL_TEXTURE_LOCATIONS[GLSL_NUM_TEXTURES] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3, GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8,
+GL_TEXTURE9, GL_TEXTURE10, GL_TEXTURE11, GL_TEXTURE12, GL_TEXTURE13, GL_TEXTURE14, GL_TEXTURE15, GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20,
+ GL_TEXTURE21, GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE27, GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31};
+
+AdvModeledObject::AdvModeledObject(Mesh* mesh){
 	objectState = nullptr;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
@@ -11,9 +16,6 @@ AdvModeledObject::AdvModeledObject(Mesh* mesh, char* texture, char* specMap, cha
 	numUVInds = mesh->_numTris * 6;
 	numNormalInds = mesh->_numTris * 9;
 	loadedMesh = mesh;
-	textureID = TextureStore::AddTexture(texture);
-	specMapID = TextureStore::AddTexture(specMap);
-	normMapID = TextureStore::AddTexture(normMap);
 	LoadTriangles();
 	material = nullptr;
 }
@@ -22,8 +24,11 @@ AdvModeledObject::~AdvModeledObject(){
 	
 }
 
-void AdvModeledObject::AddFloatVar(string name, float value){
-	var_floats.insert(pair<string, pair<float, GLuint>>(name, pair<float, GLuint>(value, 0)));
+void AdvModeledObject::SetFloatVar(string name, float value){
+	map<string, pair<float, GLuint>>::iterator current = var_floats.insert(var_floats.begin(), pair<string, pair<float, GLuint>>(name, pair<float, GLuint>(value, 0)));
+	if (current != var_floats.end()){
+		current->second.first = value;
+	}
 	if (material != nullptr){
 		if (var_floats_defaults.find(name) == var_floats_defaults.end()){
 			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
@@ -35,8 +40,11 @@ void AdvModeledObject::AddFloatVar(string name, float value){
 		material->AddUniformVariable(varID, name);
 	}
 }
-void AdvModeledObject::AddVec3Var(string name, vec3 value){
-	var_vec3s.insert(pair<string, pair<vec3, GLuint>>(name, pair<vec3, GLuint>(value, 0)));
+void AdvModeledObject::SetVec3Var(string name, vec3 value){
+	map<string, pair<vec3, GLuint>>::iterator current = var_vec3s.insert(var_vec3s.begin(), pair<string, pair<vec3, GLuint>>(name, pair<vec3, GLuint>(value, 0)));
+	if (current != var_vec3s.end()){
+		current->second.first = value;
+	}
 	if (material != nullptr){
 		if (var_vec3s_defaults.find(name) == var_vec3s_defaults.end()){
 			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
@@ -55,15 +63,29 @@ void AdvModeledObject::RemoveVec3Var(string name){
 	var_vec3s.erase(name);
 }
 
+void AdvModeledObject::SetTexture(string name, string filename){
+	if (var_textures.find(name) == var_textures.end() && var_textures.size() == GLSL_NUM_TEXTURES){
+		printf("Error: max allowed textures on object already reached");
+		return;
+	}
+	GLuint texture = TextureStore::AddTexture(filename.data());
+	map<string, GLuint>::iterator current = var_textures.insert(var_textures.begin(), pair<string, GLuint>(name, texture));
+	if (current != var_textures.end()){
+		current->second = texture;
+	}
+}
+void AdvModeledObject::RemoveTexture(string name){
+	var_textures.erase(name);
+}
+
+
 void AdvModeledObject::SetShaderSetID(GLuint setID){
-	if (material != nullptr)
-	{
+	if (material != nullptr){
 		delete material;
 		material = nullptr;
 	}
 	material = new Material(setID);
-	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
-	{
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter){
 		string name = iter->first;
 		if (var_floats_defaults.find(name) == var_floats_defaults.end()){
 			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
@@ -73,8 +95,7 @@ void AdvModeledObject::SetShaderSetID(GLuint setID){
 		}
 		material->AddUniformVariable(&iter->second.second, name);
 	}
-	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
-	{
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter){
 		string name = iter->first;
 		if (var_vec3s_defaults.find(name) == var_vec3s_defaults.end()){
 			GLuint uniformLocation = glGetUniformLocation(material->GetShaderID(), name.data());
@@ -143,12 +164,11 @@ void AdvModeledObject::LoadMaterial(){
 }
 
 void AdvModeledObject::Render(const Camera& camera){
-	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
-	{
+	if (material == nullptr) return;
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter){
 		glUniform1f(iter->second.second, iter->second.first);
 	}
-	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
-	{
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter){
 		glUniform3f(iter->second.second, iter->second.first.x, iter->second.first.y, iter->second.first.z);
 	}
 	mat4 identityMatrix = mat4(1.0f);
@@ -161,12 +181,10 @@ void AdvModeledObject::Render(const Camera& camera){
 
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 	Render();
-	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter)
-	{
+	for (map<string, pair<float, GLuint>>::iterator iter = var_floats.begin(); iter != var_floats.end(); ++iter){
 		glUniform1f(iter->second.second, var_floats_defaults.at(iter->first));
 	}
-	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter)
-	{
+	for (map<string, pair<vec3, GLuint>>::iterator iter = var_vec3s.begin(); iter != var_vec3s.end(); ++iter){
 		vec3 defaultvec = var_vec3s_defaults.at(iter->first);
 		glUniform3f(iter->second.second, defaultvec.x, defaultvec.y, defaultvec.z);
 	}
@@ -175,10 +193,8 @@ void AdvModeledObject::Render(const Camera& camera){
 void AdvModeledObject::LoadTriangles(){
 
 	GLfloat *vertexBuffer = new GLfloat[numVertInds];
-	for (int i = 0; i < loadedMesh->_numTris; ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-		{
+	for (int i = 0; i < loadedMesh->_numTris; ++i){
+		for (int j = 0; j < 3; ++j){
 			vertexBuffer[i*9 + j*3 + 0] = loadedMesh->_tris[i].vertices[j].x;
 			vertexBuffer[i*9 + j*3 + 1] = loadedMesh->_tris[i].vertices[j].y;
 			vertexBuffer[i*9 + j*3 + 2] = loadedMesh->_tris[i].vertices[j].z;
@@ -186,20 +202,16 @@ void AdvModeledObject::LoadTriangles(){
 	}
 
 	GLfloat *uvBuffer = new GLfloat[numUVInds];
-	for (int i = 0; i < loadedMesh->_numTris; ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-		{
+	for (int i = 0; i < loadedMesh->_numTris; ++i){
+		for (int j = 0; j < 3; ++j){
 			uvBuffer[i*6 + j*2 + 0] = loadedMesh->_tris[i].uvs[j].x;
 			uvBuffer[i*6 + j*2 + 1] = loadedMesh->_tris[i].uvs[j].y;
 		}
 	}
 
 	GLfloat *normalBuffer = new GLfloat[numNormalInds];
-	for (int i = 0; i < loadedMesh->_numTris; ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-		{
+	for (int i = 0; i < loadedMesh->_numTris; ++i){
+		for (int j = 0; j < 3; ++j){
 			normalBuffer[i*9 + j*3 + 0] = loadedMesh->_tris[i].normals[j].x;
 			normalBuffer[i*9 + j*3 + 1] = loadedMesh->_tris[i].normals[j].y;
 			normalBuffer[i*9 + j*3 + 2] = loadedMesh->_tris[i].normals[j].z;
@@ -209,8 +221,7 @@ void AdvModeledObject::LoadTriangles(){
 	GLfloat *tangentBuffer = new GLfloat[numNormalInds];
 	GLfloat *biTangentBuffer = new GLfloat[numNormalInds];
 
-	for (int i = 0; i < loadedMesh->_numTris; ++i)
-	{
+	for (int i = 0; i < loadedMesh->_numTris; ++i){
 		MeshTri currentTri = loadedMesh->_tris[i];
 		mat2x3 tanBiTanMat;
 		mat2 uvMat = mat2(currentTri.uvs[1]-currentTri.uvs[0], currentTri.uvs[2]-currentTri.uvs[0]);
@@ -226,8 +237,7 @@ void AdvModeledObject::LoadTriangles(){
 		bitangent = bitangent - dot(normal, bitangent) * normal - dot(tangent, bitangent) * tangent;
 		tangent = normalize(tangent);
 		bitangent = normalize(bitangent);
-		for (int j = 0; j < 3; j++)
-		{
+		for (int j = 0; j < 3; j++){
 			tangentBuffer[i*9 + j*3 + 0] = tangent.x;
 			tangentBuffer[i*9 + j*3 + 1] = tangent.y;
 			tangentBuffer[i*9 + j*3 + 2] = tangent.z;
@@ -280,27 +290,18 @@ void AdvModeledObject::LoadObjectState(char *message){
 
 void AdvModeledObject::Render(){
 
-	if (material == nullptr) return;
-	GLuint texLoc = glGetUniformLocation(material->GetShaderID(), "myTextureSampler");
-	glUniform1i(texLoc, 0);
-
-	texLoc = glGetUniformLocation(material->GetShaderID(), "DiffuseMap");
-	glUniform1i(texLoc, 0);
-
-	texLoc = glGetUniformLocation(material->GetShaderID(), "SpecularMap");
-	glUniform1i(texLoc, 1);
-
-	texLoc = glGetUniformLocation(material->GetShaderID(), "NormalMap");
-	glUniform1i(texLoc, 2);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specMapID);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, normMapID); 
+	GLuint texLoc;
+	map<string, GLuint>::iterator iter = var_textures.begin();
+	for (int i = 0; i < var_textures.size(); ++i)
+	{
+		texLoc = glGetUniformLocation(material->GetShaderID(), iter->first.data());
+		glUniform1i(texLoc, i);
+		glActiveTexture(GLSL_TEXTURE_LOCATIONS[i]);
+		glBindTexture(GL_TEXTURE_2D, iter->second);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		++iter;
+	}
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);

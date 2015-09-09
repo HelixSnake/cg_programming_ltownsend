@@ -4,27 +4,62 @@ World::World(){
 	Mesh mesh;
 	Mesh mesh2;
 	MeshLoader::loadMesh(&mesh, "sphere.obj");
-	MeshLoader::loadMesh(&mesh2, "sphere.obj");
-	_modeledobject[0] = new AdvModeledObject(&mesh, "EarthTex.bmp", "EarthSpec.bmp", "EarthNormal.bmp");
-	_modeledobject[1] = new AdvModeledObject(&mesh2, "MoonTex.bmp", "MoonSpec.bmp", "MoonNormal.bmp");
-	_modeledobject[2] = new AdvModeledObject(&mesh, "EarthTex.bmp", "MoonSpec.bmp", "MoonNormal.bmp");
-	_modeledobject[0]->AddFloatVar("objectSpecFalloff", 40.0);
-	_modeledobject[0]->AddFloatVar("normalMapHeightMult", 2.0);
-	_modeledobject[1]->AddFloatVar("normalMapHeightMult", 2.0);
-	_modeledobject[0]->AddVec3Var("objectSpecColor", vec3(0.6, 0.6, 0.4));
-	_modeledobject[2]->AddFloatVar("atmosphereThickness", 0.2);
-	_modeledobject[2]->AddVec3Var("atmosphereColor", vec3(0, 0.7, 1));
+	MeshLoader::loadMesh(&mesh2, "stanford_bunny.obj");
+	_modeledobject[0] = new AdvModeledObject(&mesh);
+	_modeledobject[1] = new AdvModeledObject(&mesh);
+	_modeledobject[2] = new AdvModeledObject(&mesh);
+	_modeledobject[3] = new AdvModeledObject(&mesh);
+	_modeledobject[4] = new AdvModeledObject(&mesh2);
+	_modeledobject[5] = new AdvModeledObject(&mesh2);
+
+	for (int i = 0; i < NUM_OBJECTS; i++)
+	{
+		_modeledobject[i]->SetTexture("DiffuseMap", "white.bmp");
+		_modeledobject[i]->SetTexture("SpecularMap", "white.bmp");
+		_modeledobject[i]->SetTexture("NormalMap", "blankNormal.bmp");
+		_modeledobject[i]->SetTexture("EmissiveMap", "white.bmp");
+		_modeledobject[i]->SetTexture("TransparencyMap", "white.bmp");
+	}
+
+	_modeledobject[0]->SetTexture("DiffuseMap", "EarthTex.bmp");
+	_modeledobject[0]->SetTexture("SpecularMap", "EarthSpec.bmp");
+	_modeledobject[0]->SetTexture("NormalMap", "EarthNormal.bmp");
+	_modeledobject[0]->SetTexture("EmissiveMap", "EarthLum.bmp");
+
+	_modeledobject[1]->SetTexture("DiffuseMap", "MoonTex.bmp");
+	_modeledobject[1]->SetTexture("SpecularMap", "MoonSpec.bmp");
+	_modeledobject[1]->SetTexture("NormalMap", "MoonNormal.bmp");
+	
+	_modeledobject[3]->SetTexture("TransparencyMap", "EarthClouds.bmp");
+	_modeledobject[3]->SetFloatVar("objectTransparency", 0.6);
+
+	_modeledobject[4]->SetTexture("DiffuseMap", "EarthTex.bmp");
+	_modeledobject[5]->SetTexture("DiffuseMap", "grasstex.bmp");
+
+	_modeledobject[0]->SetFloatVar("objectSpecFalloff", 40.0);
+	_modeledobject[0]->SetFloatVar("normalMapHeightMult", 1.0);
+	_modeledobject[1]->SetFloatVar("normalMapHeightMult", 2.0);
+	_modeledobject[0]->SetVec3Var("objectSpecColor", vec3(0.6, 0.6, 0.4));
+	_modeledobject[0]->SetVec3Var("objectEmissiveColor", vec3(1, 1, 1));
+	_modeledobject[0]->SetFloatVar("objectGlow", 0.3);
+	_modeledobject[2]->SetFloatVar("atmosphereThickness", 0.2);
+	_modeledobject[2]->SetFloatVar("atmosphereAlpha", 0.9);
+	_modeledobject[2]->SetVec3Var("atmosphereColor", vec3(0, 0.7, 1));
 
 	_modeledobject[1]->SetPosition(vec3(0, 3, 0));
+	_modeledobject[4]->SetPosition(vec3(-3, 0, 0));
+	_modeledobject[5]->SetPosition(vec3(3, 0, 0));
 	//TODO: fix normals for scaled objects
 	_modeledobject[0]->SetScale(vec3(1,1,1));
 	_modeledobject[2]->SetScale(vec3(1,1,1));
+	_modeledobject[3]->SetScale(vec3(1.005,1.005,1.005));
 	_modeledobject[1]->SetScale(vec3(0.1,0.1,0.1));
 	{
 		mat4 identity = mat4(1.0);
 		vec3 vec = vec3(0,0,1);
 		float angle = -23;
 		_modeledobject[0]->SetRotationMatrix(glm::rotate(identity, angle, vec));
+		_modeledobject[3]->SetRotationMatrix(glm::rotate(identity, angle, vec));
 	}
 	//_texturedobject = new TexturedObject();
 	//SaveObjectStates();
@@ -41,6 +76,9 @@ void World::ApplyShaders(){
 	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
+	_modeledobject[3]->SetShaderSetID(this->LoadShaderSet("advShader"));
+	_modeledobject[4]->SetShaderSetID(this->LoadShaderSet("toon"));
+	_modeledobject[5]->SetShaderSetID(this->LoadShaderSet("iridescent"));
 	for (int i = 0; i < NUM_OBJECTS; i++)
 	{
 		_modeledobject[i]->SendUniformVariable(&_camera->projMatrixID, "Proj");
@@ -91,6 +129,7 @@ void World::Update(const float& deltaTime){
 	vec3 axis = vec3(0,sin(angle),-cos(angle));
 	_modeledobject[0]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
 	_modeledobject[1]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
+	_modeledobject[3]->AddRotation(vec3(0, 1, 0), deltaTime * 9);
 	ResetWorld();
 }
 

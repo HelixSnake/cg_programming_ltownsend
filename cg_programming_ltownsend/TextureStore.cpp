@@ -2,7 +2,7 @@
 
 std::map<std::string, GLuint> TextureStore::_indexMap;
 
-GLuint TextureStore::AddTexture(char* path)
+GLuint TextureStore::AddTexture(const char* path)
 {
 	if (_indexMap.find(std::string(path)) == _indexMap.end())
 	{
@@ -13,7 +13,7 @@ GLuint TextureStore::AddTexture(char* path)
 	else return _indexMap.at(std::string(path));
 }
 
-GLuint TextureStore::GetTexture(char* path)
+GLuint TextureStore::GetTexture(const char* path)
 {
 	if (_indexMap.find(std::string(path)) == _indexMap.end()) return 0;
 	return _indexMap.at(std::string(path));

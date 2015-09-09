@@ -7,8 +7,8 @@
 class TextureStore
 {
 public:
-	static GLuint AddTexture(char* path);
-	static GLuint GetTexture(char* path);
+	static GLuint AddTexture(const char* path);
+	static GLuint GetTexture(const char* path);
 private:
 	static std::map<std::string, GLuint> _indexMap;
 };

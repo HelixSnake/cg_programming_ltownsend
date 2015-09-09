@@ -14,6 +14,7 @@ uniform mat4 MVP;
 uniform mat4 MV;
 uniform mat4 Proj;
 uniform mat4 View;
+uniform float outlineThickness = 0.03;
 
 void main() {
 	
@@ -49,21 +50,21 @@ void main() {
 	normal = (normalg[0].xyz);
 	isOutline = 1;
 
-	gl_Position = MVP * gl_in[0].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[0]).xyz), 0) * 0.1;
+	gl_Position = MVP * gl_in[0].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[0]).xyz), 0) * outlineThickness;
     EmitVertex();
 	
 	UV = UVg[2];
 	normal = (normalg[2].xyz);
 	isOutline = 1;
 
-    gl_Position = MVP * gl_in[2].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[2]).xyz), 0) * 0.1;
+    gl_Position = MVP * gl_in[2].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[2]).xyz), 0) * outlineThickness;
     EmitVertex();
 	
 	UV = UVg[1];
 	normal = (normalg[1].xyz);
 	isOutline = 1;
 
-	gl_Position = MVP * gl_in[1].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[1]).xyz), 0) * 0.1;
+	gl_Position = MVP * gl_in[1].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[1]).xyz), 0) * outlineThickness;
     EmitVertex();
 
     EndPrimitive();

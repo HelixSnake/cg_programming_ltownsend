@@ -391,7 +391,7 @@ int main(){
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
 	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
 	camera.MVMatrixID = glGetUniformLocation(programID, "MV");
-	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
+	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, 0.05f, Z_FAR);
 
 	light.directionID = glGetUniformLocation(programID, "lightDir");
 	camera.fwdVecID = glGetUniformLocation(programID, "cameraVec");
@@ -413,7 +413,7 @@ int main(){
 	light.direction = vec3(0,0,-1);
 
 	do{
-		glClearColor(0.0, 0.1, 0.1, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Game Update Code
 		float deltaTime = GetDeltaTime();

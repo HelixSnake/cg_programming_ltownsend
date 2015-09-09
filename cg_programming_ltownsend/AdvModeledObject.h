@@ -9,17 +9,20 @@
 class AdvModeledObject{
 
 	public:
-		AdvModeledObject(Mesh* mesh, char* texture, char* specMap, char* normMap);
+		AdvModeledObject(Mesh* mesh);
 
 		virtual ~AdvModeledObject();
 		virtual void Update(const float& deltaTime);
 		virtual void LoadMaterial();
 		virtual void Render(const Camera& camera);
 
-		void AddFloatVar(string name, float value);
-		void AddVec3Var(string name, vec3 value);
+		void SetFloatVar(string name, float value);
+		void SetVec3Var(string name, vec3 value);
 		void RemoveFloatVar(string name);
 		void RemoveVec3Var(string name);
+		
+		void SetTexture(string name, string filename);
+		void RemoveTexture(string name);
 
 		void SetShaderSetID(GLuint setID);
 		void SendUniformVariable(GLuint* variableAddress, string uniformString);
@@ -56,11 +59,9 @@ class AdvModeledObject{
 		GLuint tangentBufferID;
 		GLuint biTangentBufferID;
 		GLenum renderMode;
-		GLuint textureID;
-		GLuint specMapID;
-		GLuint normMapID;
 		Material* material;
 
+		map<string, GLuint> var_textures;
 		map<string, pair<float, GLuint>> var_floats;
 		map<string, pair<vec3, GLuint>> var_vec3s;
 		map<string, float> var_floats_defaults;

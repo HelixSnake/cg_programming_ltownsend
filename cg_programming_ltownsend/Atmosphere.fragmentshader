@@ -9,23 +9,25 @@ in vec4 position;
 out vec4 color;
  
 // Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
 uniform vec3 cameraVec;
 uniform vec3 lightDir;
 uniform vec3 atmosphereColor = vec3(0,0,0);
+uniform float atmosphereAlpha = 1.0;
 uniform mat4 MV;
 uniform mat4 MVP;
 uniform mat4 Proj;
 uniform mat4 View;
  
+mat4 I_VP = inverse(Proj * View);
+float PI = 3.14159265358979323846264;
+vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
+
 void main(){
 
-	mat4 I_VP = inverse(Proj * View);
  
-	vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
 	vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
 
-	float alpha = max(dot(cameraToPointVec, normal), 0);
+	float alpha = pow(max(dot(cameraToPointVec, normal), 0), 2) * atmosphereAlpha;
 
     // Output color = color of the texture at the specified UV
 	color = vec4(atmosphereColor, alpha);
