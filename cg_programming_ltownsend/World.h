@@ -6,6 +6,7 @@
 #include "ModeledObject.h"
 #include "AdvModeledObject.h"
 #include "MeshLoader.h"
+#include <vector>
 
 class World{
 
@@ -17,7 +18,6 @@ class World{
 		void LoadObjectStates();
 		void ResetWorld();
 		void setCamera(Camera* camera) {_camera = camera;};
-		void setLight(DirectionLight* light) {_light = light;};
 		void Update(const float& deltaTime);
 		void Render(const Camera& camera);
 		void ApplyShaders();
@@ -33,5 +33,8 @@ class World{
 		map<string, GLuint> _shadersets;
 		GLuint _defaultShaderSet;
 		Camera* _camera;
-		DirectionLight* _light;
+		int _numDirLights;
+		int _numPointLights;
+		vector<DirectionLight> _dirlights;
+		vector<PointLight> _pointlights;
 };

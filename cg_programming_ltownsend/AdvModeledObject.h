@@ -26,6 +26,9 @@ class AdvModeledObject{
 
 		void SetShaderSetID(GLuint setID);
 		void SendUniformVariable(GLuint* variableAddress, string uniformString);
+		void SetUniformVariable(string uniformString, vec3 value);
+		void SetUniformVariable(string uniformString, float value);
+		void SetUniformVariable(string uniformString, int value);
 		void SetPosition(vec3 position);
 		void SetScale(vec3 scale);
 		void SetRotationMatrix(mat4 rotation);

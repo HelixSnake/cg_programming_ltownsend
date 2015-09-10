@@ -51,11 +51,19 @@ struct Camera{
 	GLuint fwdVecID;
 	vec3 fwdVec;
 	mat4 projectionMatrix, viewMatrix, MVPMatrix;
+	void setValuesIntoIDs(){
+		glUniform3f(this->fwdVecID, this->fwdVec.x, this->fwdVec.y, this->fwdVec.z);
+		glUniformMatrix4fv(this->projMatrixID, 1, GL_FALSE, &this->projectionMatrix[0][0]);
+		glUniformMatrix4fv(this->viewMatrixID, 1, GL_FALSE, &this->viewMatrix[0][0]);
+	}
 };
 
 struct DirectionLight{
-	GLuint directionID;
-	GLuint diffuseColorID;
-	GLuint specColorID;
 	vec3 diffuseColor, specColor, direction;
+	float intensity;
+};
+
+struct PointLight{
+	vec3 diffuseColor, specColor, position, attenuation;
+	float intensity;
 };

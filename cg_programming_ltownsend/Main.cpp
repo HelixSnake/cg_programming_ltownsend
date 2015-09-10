@@ -191,87 +191,6 @@ int InitGlewFailed(){
 	return EXIT_WITH_SUCCESS;
 }
 
-GLuint& LoadQuad(){
-	static GLfloat g_vertex_buffer_data[] = {
-		0.0f, 0.0f, 0.0f,
-		1.0f, -0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-
-		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	for(int i = 0, size = 18; i < size; ++i){
-		g_vertex_buffer_data[i] -= 0.5f;
-	}
-
-	GLuint vertexBuffer = 0;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	return vertexBuffer;
-}
-GLuint& LoadQuadColors(){
-	static GLfloat g_vertex_buffer_data[] = {
-		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0,
-		1.0f, 0.0f, 0.0f, 0.0, 1.0, 0.0,
-		1.0f, 1.0f, 0.0f, 0.0, 0.0, 1.0,
-
-		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0,
-		1.0f, 1.0f, 0.0f, 0.0, 0.0, 1.0,
-		0.0f, 1.0f, 0.0f, 0.0, 1.0, 0.0
-	};
-
-	for(int i = 0, size = 36; i < size; ++i){
-		if (i%6 < 3)
-		{
-			g_vertex_buffer_data[i] -= 0.5f;
-		}
-	}
-
-	GLuint vertexBuffer = 0;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	return vertexBuffer;
-}
-
-
-GLuint& LoadTriangle(){
-	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	GLuint vertexBuffer = 0;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	return vertexBuffer;
-}
-
-mat4 RenderVertex(GLuint vertexBuffer){
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-	glVertexAttribPointer(
-		0,			//attribute layout
-		3,			//Elements in array
-		GL_FLOAT,	//Each element is of type float
-		GL_FALSE,	//Normalized?
-		0,			//Stride...
-		(void*)0	//Array buffer offset...
-	);
-
-	mat4 positionMatrix = mat4(1.0f);
-	return positionMatrix;
-}
-
 void RenderColoredVertex(GLuint vertexBuffer){
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -293,36 +212,6 @@ void RenderColoredVertex(GLuint vertexBuffer){
 		sizeof(GL_FLOAT)*6,			//Stride...
 		(void*)(sizeof(GL_FLOAT)*3)	//Array buffer offset...
 	);
-}
-
-void RenderTriangle(GLuint vertexBuffer, const vec3 &position){
-	mat4 positionMatrix = RenderVertex(vertexBuffer);
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDisableVertexAttribArray(0);
-}
-
-mat4 RenderQuad(GLuint vertexBuffer, const vec3 &position, const vec3 &scale){
-	mat4 finalMatrix = RenderVertex(vertexBuffer);
-	finalMatrix = translate(finalMatrix, position);
-	mat4 scaleMatrix = mat4(
-		scale.x, 0, 0, 0,
-		0, scale.y, 0, 0,
-		0, 0, scale.z, 0,
-		0, 0, 0, 1
-		);
-	finalMatrix = finalMatrix * scaleMatrix;
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDisableVertexAttribArray(0);
-	return finalMatrix;
-}
-
-void RenderQuadColors(GLuint vertexBuffer){
-	RenderColoredVertex(vertexBuffer);
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDisableVertexAttribArray(0);
 }
 
 float& GetDeltaTime(){
@@ -369,18 +258,12 @@ int main(){
 
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
-	GLuint triangleID = LoadTriangle();
-	GLuint quadID = LoadQuad();
-	GLuint quadcolorID = LoadQuadColors();
-
 
 	glUseProgram(programID);
 
 	Camera camera;
 	World world;
-	DirectionLight light;
 	world.setCamera(&camera);
-	world.setLight(&light);
 	world.SetDefaultShaderSet(toonShaderID);
 	world.AddShaderSet("default", programID);
 	world.AddShaderSet("toon", toonShaderID);
@@ -389,12 +272,12 @@ int main(){
 	world.AddShaderSet("atmosphere", atmosphereShaderID);
 	world.ApplyShaders();
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
-	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
-	camera.MVMatrixID = glGetUniformLocation(programID, "MV");
+	//camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
+	//camera.MVMatrixID = glGetUniformLocation(programID, "MV");
 	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, 0.05f, Z_FAR);
 
-	light.directionID = glGetUniformLocation(programID, "lightDir");
-	camera.fwdVecID = glGetUniformLocation(programID, "cameraVec");
+	//dirlight.directionID = glGetUniformLocation(programID, "lightDir");
+	//camera.fwdVecID = glGetUniformLocation(programID, "cameraVec");
 
 	glm::vec3 position = glm::vec3( 0, 0, 5 );
 	// horizontal angle : toward -Z
@@ -407,10 +290,6 @@ int main(){
 	float speed = 5.0f; // 3 units / second
 	float mouseSpeed = 0.05f;
 	float elapsedTime = 0;
-
-	light.diffuseColor = vec3(1,1,1);
-	light.specColor = vec3(1,1,1);
-	light.direction = vec3(0,0,-1);
 
 	do{
 		glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -467,7 +346,6 @@ int main(){
 		);
 		
 		//light.direction = direction;
-		glUniform3f(light.directionID, light.direction.x, light.direction.y, light.direction.z);
 		glUniform3f(camera.fwdVecID, direction.x, direction.y, direction.z);
 		camera.fwdVec = direction;
 

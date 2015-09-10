@@ -112,6 +112,21 @@ void AdvModeledObject::SendUniformVariable(GLuint* variableAddress, string unifo
 		material->AddUniformVariable(variableAddress, uniformString);
 	}
 }
+void AdvModeledObject::SetUniformVariable(string uniformString, vec3 value){
+	if (material != nullptr){
+		glUniform3f(glGetUniformLocation(material->GetShaderID(), uniformString.data()), value.x, value.y, value.z);
+	}
+}
+void AdvModeledObject::SetUniformVariable(string uniformString, float value){
+	if (material != nullptr){
+		glUniform1f(glGetUniformLocation(material->GetShaderID(), uniformString.data()), value);
+	}
+}
+void AdvModeledObject::SetUniformVariable(string uniformString, int value){
+	if (material != nullptr){
+		glUniform1i(glGetUniformLocation(material->GetShaderID(), uniformString.data()), value);
+	}
+}
 
 void AdvModeledObject::SetPosition(vec3 position){
 	this->position = position;
