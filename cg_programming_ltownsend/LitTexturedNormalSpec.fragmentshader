@@ -14,6 +14,7 @@ struct DirLight {
 	vec3 direction;
 	vec3 diffuse;
 	vec3 specular;
+	float intensity;
 };
 
 struct PointLight {
@@ -21,6 +22,7 @@ struct PointLight {
 	vec3 diffuse;
 	vec3 specular;
 	vec3 attenuation;
+	float intensity;
 };
  
  #define NUM_DIR_LIGHTS 100
@@ -32,14 +34,16 @@ uniform sampler2D SpecularMap;
 uniform sampler2D NormalMap;
 uniform sampler2D EmissiveMap;
 uniform sampler2D TransparencyMap;
-uniform vec3 objectEmissiveColor = vec3(0,0,0);
-uniform float objectGlow = 0.0f;
-uniform vec3 lightAmbientColor = vec3(0,0,0);
-uniform float objectReflectance = 0;
+
 uniform DirLight dirlights[NUM_DIR_LIGHTS];
 uniform PointLight pointlights[NUM_POINT_LIGHTS];
 uniform int numpointlights = 0;
 uniform int numdirlights = 0;
+
+uniform vec3 objectEmissiveColor = vec3(0,0,0);
+uniform float objectGlow = 0.0f;
+uniform vec3 lightAmbientColor = vec3(0,0,0);
+uniform float objectReflectance = 0;
 uniform float objectSpecFalloff = 20.0;
 uniform vec3 objectSpecColor = vec3(1,1,1);
 uniform float objectSpecIntensity = 1;
@@ -56,18 +60,18 @@ void main(){
 	vec3 newNormal = normalize(tangentSpaceMat * normalize(texture( NormalMap, UV ).rgb * 2.0 - 1.0));
 	// EMISSIVE COLOR
 	vec3 emissiveColor = objectEmissiveColor * objectGlow * texture( EmissiveMap, UV ).rgb;
-	//totalColor += emissiveColor;
+	totalColor += emissiveColor;
 
 	// AMBIENT COLOR
 	vec3 ambientColor = lightAmbientColor * objectReflectance;
-	//totalColor += ambientColor;
+	totalColor += ambientColor;
 
 	// DIFFUSE COLOR
 	for (int i = 0; i < numdirlights; i++)
 	{
 		float diffuseIntensity = dot(-dirlights[i].direction, newNormal);
 		diffuseIntensity = clamp(diffuseIntensity, 0, 1);
-		vec3 diffuseColor = texture( DiffuseMap, UV ).rgb * diffuseIntensity * dirlights[i].diffuse;
+		vec3 diffuseColor = texture( DiffuseMap, UV ).rgb * diffuseIntensity * dirlights[i].diffuse * dirlights[i].intensity;
 
 		totalColor += diffuseColor;
 
@@ -88,25 +92,25 @@ void main(){
 		float pointlightdistance = length(pointLightDisp);
 		vec3 pointlightdir = normalize(pointLightDisp);
 		
-		float attenuation = 1.0/ (pointlights[i].attenuation.x +
+		float attenuation = 1.0 / (pointlights[i].attenuation.x +
 		pointlights[i].attenuation.y * pointlightdistance +
 		pointlights[i].attenuation.z * pointlightdistance * pointlightdistance);
+
+		float diffuseIntensity = dot(-pointlightdir, newNormal) * attenuation * pointlights[i].intensity;
+		diffuseIntensity = clamp(diffuseIntensity, 0, 1);
+		vec3 diffuseColor = texture( DiffuseMap, UV ).rgb * diffuseIntensity * pointlights[i].diffuse;
+	
+		totalColor += diffuseColor;
+
+		vec3 reflectionVector = pointlightdir - dot(pointlightdir, newNormal) * 2 * newNormal;
+		float specintensity = dot(-cameraVec, normalize(reflectionVector));
+		specintensity = clamp(specintensity, 0, 1);
+		specintensity = pow(specintensity, objectSpecFalloff);
+		specintensity *= diffuseIntensity;
+		vec3 specularColor = pointlights[i].specular * objectSpecColor * specintensity * texture( SpecularMap, UV ).rgb * attenuation * pointlights[i].intensity;
+	
+		totalColor += specularColor;
 	}
-
-	/*diffuseIntensity = dot(-pointlightdir, newNormal) * attenuation * pointlightIntensity;
-	diffuseIntensity = clamp(diffuseIntensity, 0, 1);
-	diffuseColor = texture( DiffuseMap, UV ).rgb * diffuseIntensity * pointlightDiffuseColor;
-	
-	totalColor += diffuseColor;
-
-	reflectionVector = pointlightdir - dot(pointlightdir, newNormal) * 2 * newNormal;
-	specintensity = dot(-cameraVec, normalize(reflectionVector));
-	specintensity = clamp(specintensity, 0, 1);
-	specintensity = pow(specintensity, objectSpecFalloff);
-	specintensity *= diffuseIntensity;
-	specularColor = pointlightSpecColor * objectSpecColor * specintensity * texture( SpecularMap, UV ).rgb * attenuation * pointlightIntensity;
-	
-	totalColor += specularColor;*/
 
 	// TOTAL COLOR
     color = vec4(totalColor, length(texture( TransparencyMap, UV ).rgb) * objectTransparency);

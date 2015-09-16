@@ -3,39 +3,119 @@
 // Interpolated values from the vertex shaders
 in vec2 UV;
 in vec3 normal;
-in vec3 newLightDir;
+in vec3 position;
 flat in int isOutline;
  
 // Ouput data
 out vec4 color;
+
+struct DirLight {
+	vec3 direction;
+	vec3 diffuse;
+	vec3 specular;
+	float intensity;
+};
+
+struct PointLight {
+	vec3 position;
+	vec3 diffuse;
+	vec3 specular;
+	vec3 attenuation;
+	float intensity;
+};
  
+ #define NUM_DIR_LIGHTS 100
+ #define NUM_POINT_LIGHTS 100
 // Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
+uniform sampler2D DiffuseMap;
+
+uniform DirLight dirlights[NUM_DIR_LIGHTS];
+uniform PointLight pointlights[NUM_POINT_LIGHTS];
+uniform int numpointlights = 0;
+uniform int numdirlights = 0;
+
 uniform vec3 cameraVec;
-uniform vec3 lightDir;
- 
+uniform int diffuseSteps = 3;
+uniform int specSteps = 2;
+uniform float minIntensity = 0.1;
+
 void main(){
  
     // Output color = color of the texture at the specified UV
+	vec3 outColor = vec3(0,0,0);
+	color = vec4(0,0,0,1);
+	if (isOutline == 1) return;
+	for (int i = 0; i < numdirlights; i++)
+	{
+		float intensity = dot(-dirlights[i].direction, normal);
+		intensity = max(intensity, 0);
 
-	float intensity = dot(-lightDir,normal);
+		float newIntensity = 0;
 
-	intensity = intensity * 3.5;
-	intensity = floor(intensity);
-	intensity = clamp(intensity / 3, 0.2, 1);
+		for (int i = 0; i < diffuseSteps; i++)
+		{
+			float currentStep = (i + 1.0) / (diffuseSteps + 1);
+			newIntensity += step(currentStep, intensity);
+		}
+		intensity = newIntensity / diffuseSteps;
 
-	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
-	float specintensity = clamp(dot(-cameraVec, normalize(reflectionVector)), 0, 1);
+		vec3 reflectionVector = dirlights[i].direction - dot(dirlights[i].direction, normal) * 2 * normal;
+		float specintensity = max(dot(-cameraVec, normalize(reflectionVector)), 0);
 	
-	specintensity = pow(specintensity, 20.0);
+		specintensity = pow(specintensity, 20.0);
 
-	specintensity = specintensity * 3;
-	specintensity = floor(specintensity);
-	specintensity = specintensity / 3;
+		float newSpecIntensity = 0;
 
-    color = texture( myTextureSampler, UV ).rgba * intensity;
-	color = color + vec4(1,1,1,1) * specintensity * intensity;
+		for (int i = 0; i < specSteps; i++)
+		{
+			float currentStep = (i + 1.0) / (specSteps + 1);
+			newSpecIntensity += step(currentStep, specintensity);
+		}
+		specintensity = newSpecIntensity / specSteps;
 
-	color = color * (1 - isOutline);
-	color.w = 1;
+		outColor += texture( DiffuseMap, UV ).rgb * dirlights[i].diffuse * intensity;
+		outColor += dirlights[i].specular * specintensity * intensity;
+	}
+
+	for (int i = 0; i < numpointlights; i++)
+	{
+		vec3 pointLightDisp = position - pointlights[i].position;
+		float pointlightdistance = length(pointLightDisp);
+		vec3 pointlightdir = normalize(pointLightDisp);
+		
+		float attenuation = 1.0 / (pointlights[i].attenuation.x +
+		pointlights[i].attenuation.y * pointlightdistance +
+		pointlights[i].attenuation.z * pointlightdistance * pointlightdistance);
+
+		float intensity = dot(-pointlightdir, normal) * attenuation;
+		intensity = max(intensity, 0);
+
+		float newIntensity = 0;
+
+		for (int i = 0; i < diffuseSteps; i++)
+		{
+			float currentStep = (i + 1.0) / (diffuseSteps + 1);
+			newIntensity += step(currentStep, intensity);
+		}
+		intensity = newIntensity / diffuseSteps;
+
+		vec3 reflectionVector = pointlightdir - dot(pointlightdir, normal) * 2 * normal;
+		float specintensity = max(dot(-cameraVec, normalize(reflectionVector)), 0);
+	
+		specintensity = pow(specintensity, 20.0) * attenuation;
+
+		float newSpecIntensity = 0;
+
+		for (int i = 0; i < specSteps; i++)
+		{
+			float currentStep = (i + 1.0) / (specSteps + 1);
+			newSpecIntensity += step(currentStep, specintensity);
+		}
+		specintensity = newSpecIntensity / specSteps;
+
+		outColor += texture( DiffuseMap, UV ).rgb * pointlights[i].diffuse * intensity;
+		outColor += pointlights[i].specular * specintensity * intensity;
+	}
+
+	color = vec4(outColor, 1);
 }

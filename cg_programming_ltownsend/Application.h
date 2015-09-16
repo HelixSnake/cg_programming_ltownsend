@@ -59,11 +59,24 @@ struct Camera{
 };
 
 struct DirectionLight{
+	DirectionLight() {
+		diffuseColor = vec3(1, 1, 1);
+		specColor = vec3(1, 1, 1);
+		direction = vec3(0, 0, 0);
+		intensity = 1;
+	}
 	vec3 diffuseColor, specColor, direction;
 	float intensity;
 };
 
 struct PointLight{
+	PointLight() {
+		diffuseColor = vec3(1, 1, 1);
+		specColor = vec3(1, 1, 1);
+		position = vec3(0, 0, 0);
+		attenuation = vec3(1, 0, 0);
+		intensity = 1;
+	}
 	vec3 diffuseColor, specColor, position, attenuation;
 	float intensity;
 };

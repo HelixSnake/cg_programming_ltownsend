@@ -8,6 +8,7 @@ in vec4 normalg[];
 
 out vec2 UV;
 out vec3 normal;
+out vec3 position;
 flat out int isOutline;
 
 uniform mat4 MVP;
@@ -25,6 +26,7 @@ void main() {
 	isOutline = 0;
 
 	gl_Position = gl_in[0].gl_Position;
+	position = (MV * gl_Position).xyz;
 	gl_Position = MVP * gl_Position;
     EmitVertex();
 	
@@ -33,6 +35,7 @@ void main() {
 	isOutline = 0;
 
     gl_Position = gl_in[1].gl_Position;
+	position = (MV * gl_Position).xyz;
 	gl_Position = MVP * gl_Position;
     EmitVertex();
 	
@@ -41,6 +44,7 @@ void main() {
 	isOutline = 0;
 
 	gl_Position = gl_in[2].gl_Position;
+	position = (MV * gl_Position).xyz;
 	gl_Position = MVP * gl_Position;
     EmitVertex();
 	

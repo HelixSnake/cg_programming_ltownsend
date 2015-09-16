@@ -8,10 +8,19 @@ World::World(){
 	for (int i = 0; i < NUM_OBJECTS; i++){
 		_modeledobject[i] = nullptr;
 	}
-	_dirlights.push_back(DirectionLight());
-	_dirlights[0].direction = vec3(0, 0, -1);
-	_dirlights[0].diffuseColor = vec3(1, 1, 1);
-	_dirlights[0].specColor = vec3(1, 1, 1);
+	//_dirlights.push_back(DirectionLight());
+	//_dirlights[0].direction = vec3(0, 0, -1);
+	//_dirlights[0].diffuseColor = vec3(0.9, 0.9, 0.9);
+	_pointlights.push_back(PointLight());
+	//_pointlights.push_back(PointLight());
+	_pointlights[0].position = vec3(0, 0, 1000);
+	//_pointlights[1].position = vec3(0, 2, 0);
+	_pointlights[0].diffuseColor = vec3(1, 1, 0.9);
+	_pointlights[0].specColor = vec3(1, 1, 0.7);
+	_pointlights[0].intensity = 1.2;
+	//_pointlights[1].diffuseColor = vec3(0, 1, 0);
+	_pointlights[0].attenuation = vec3(1, 0, 0);
+	//_pointlights[1].attenuation = vec3(1, 0, 1);
 	Mesh mesh;
 	Mesh mesh2;
 	MeshLoader::loadMesh(&mesh, "sphere.obj");
@@ -22,6 +31,8 @@ World::World(){
 	_modeledobject[3] = new AdvModeledObject(&mesh);
 	_modeledobject[4] = new AdvModeledObject(&mesh2);
 	_modeledobject[5] = new AdvModeledObject(&mesh);
+	_modeledobject[6] = new AdvModeledObject(&mesh);
+	_modeledobject[7] = new AdvModeledObject(&mesh);
 
 	for (int i = 0; i < NUM_OBJECTS; i++){
 		if (_modeledobject[i] == nullptr) continue;
@@ -32,16 +43,20 @@ World::World(){
 		_modeledobject[i]->SetTexture("TransparencyMap", "white.bmp");
 	}
 
-	//_modeledobject[0]->SetTexture("DiffuseMap", "EarthTex.bmp");
-	//_modeledobject[0]->SetTexture("SpecularMap", "EarthSpec.bmp");
-	//_modeledobject[0]->SetTexture("NormalMap", "EarthNormal.bmp");
+	_modeledobject[0]->SetTexture("DiffuseMap", "EarthTex.bmp");
+	_modeledobject[0]->SetTexture("SpecularMap", "EarthSpec.bmp");
+	_modeledobject[0]->SetTexture("NormalMap", "EarthNormal.bmp");
 	//_modeledobject[0]->SetTexture("EmissiveMap", "EarthLum.bmp");
 
-	//_modeledobject[1]->SetTexture("DiffuseMap", "MoonTex.bmp");
-	//_modeledobject[1]->SetTexture("SpecularMap", "MoonSpec.bmp");
-	//_modeledobject[1]->SetTexture("NormalMap", "MoonNormal.bmp");
+	_modeledobject[1]->SetTexture("DiffuseMap", "MoonTex.bmp");
+	_modeledobject[1]->SetTexture("SpecularMap", "MoonSpec.bmp");
+	_modeledobject[1]->SetTexture("NormalMap", "MoonNormal.bmp");
 	
-	//_modeledobject[3]->SetTexture("TransparencyMap", "EarthClouds.bmp");
+	_modeledobject[5]->SetTexture("DiffuseMap", "black.bmp");
+	_modeledobject[5]->SetTexture("SpecularMap", "black.bmp");
+	_modeledobject[5]->SetTexture("EmissiveMap", "sun.bmp");
+	
+	_modeledobject[3]->SetTexture("TransparencyMap", "EarthClouds.bmp");
 	_modeledobject[3]->SetFloatVar("objectTransparency", 0.6);
 
 	//_modeledobject[4]->SetTexture("DiffuseMap", "EarthTex.bmp");
@@ -50,19 +65,32 @@ World::World(){
 	_modeledobject[0]->SetFloatVar("objectSpecFalloff", 40.0);
 	_modeledobject[0]->SetFloatVar("normalMapHeightMult", 1.0);
 	_modeledobject[1]->SetFloatVar("normalMapHeightMult", 2.0);
-	_modeledobject[0]->SetVec3Var("objectSpecColor", vec3(0.6, 0.6, 0.4));
+	//_modeledobject[0]->SetVec3Var("objectSpecColor", vec3(0.6, 0.6, 0.4));
 	_modeledobject[0]->SetVec3Var("objectEmissiveColor", vec3(1, 1, 1));
-	_modeledobject[0]->SetFloatVar("objectGlow", 0.3);
-	_modeledobject[5]->SetFloatVar("atmosphereThickness", 0.2);
-	_modeledobject[5]->SetFloatVar("atmosphereAlpha", 0.9);
-	_modeledobject[5]->SetVec3Var("atmosphereColor", vec3(0, 0.7, 1));
-
+	_modeledobject[0]->SetVec3Var("objectSpecColor", vec3(0.8, 0.8, 0.8));
+	//_modeledobject[0]->SetFloatVar("objectGlow", 0.3);
+	_modeledobject[7]->SetFloatVar("atmosphereThickness", 0.2);
+	_modeledobject[7]->SetFloatVar("atmosphereAlpha", 0.9);
+	_modeledobject[7]->SetVec3Var("atmosphereColor", vec3(0, 0.7, 1));
+	_modeledobject[5]->SetFloatVar("objectGlow", 1);
+	_modeledobject[5]->SetVec3Var("objectEmissiveColor", vec3(1, 1, 1));
+	_modeledobject[6]->SetFloatVar("atmosphereThickness", 50);
+	_modeledobject[6]->SetFloatVar("atmosphereAlpha", 1.5);
+	_modeledobject[6]->SetVec3Var("atmosphereColor", vec3(1, 1, 0.6));
+	
+	_modeledobject[0]->SetPosition(vec3(0, 0, 0));
 	_modeledobject[1]->SetPosition(vec3(0, 3, 0));
+	_modeledobject[3]->SetPosition(vec3(0, 0, 0));
+	_modeledobject[7]->SetPosition(vec3(0, 0, 0));
 	_modeledobject[4]->SetPosition(vec3(-3, 0, 0));
 	_modeledobject[2]->SetPosition(vec3(3, 0, 0));
+	_modeledobject[5]->SetPosition(vec3(0, 0, 1000));
+	_modeledobject[6]->SetPosition(vec3(0, 0, 1000));
 	//TODO: fix normals for scaled objects
 	_modeledobject[0]->SetScale(vec3(1,1,1));
-	_modeledobject[5]->SetScale(vec3(1,1,1));
+	_modeledobject[7]->SetScale(vec3(1,1,1));
+	_modeledobject[5]->SetScale(vec3(100,100,100));
+	_modeledobject[6]->SetScale(vec3(100,100,100));
 	_modeledobject[3]->SetScale(vec3(1.005,1.005,1.005));
 	_modeledobject[1]->SetScale(vec3(0.1,0.1,0.1));
 	{
@@ -89,10 +117,12 @@ World::~World(){
 void World::ApplyShaders(){
 	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("advShader"));
-	_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("iridescent"));
-	//_modeledobject[3]->SetShaderSetID(this->LoadShaderSet("advShader"));
-	_modeledobject[4]->SetShaderSetID(this->LoadShaderSet("toon"));
-	_modeledobject[5]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
+	//_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("iridescent"));
+	_modeledobject[3]->SetShaderSetID(this->LoadShaderSet("advShader"));
+	//_modeledobject[4]->SetShaderSetID(this->LoadShaderSet("toon"));
+	_modeledobject[7]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
+	_modeledobject[5]->SetShaderSetID(this->LoadShaderSet("advShader"));
+	_modeledobject[6]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
 	for (int i = 0; i < NUM_OBJECTS; i++)
 	{
 		if (_modeledobject[i] == nullptr) continue;
@@ -158,19 +188,21 @@ void World::Render(const Camera& camera){
 		_camera->setValuesIntoIDs();
 		_modeledobject[i]->SetUniformVariable("numdirlights", _numDirLights);
 		_modeledobject[i]->SetUniformVariable("numpointlights", _numPointLights);
-		for (int i = 0; i < _numDirLights; i++){
+		for (int j = 0; j < _numDirLights; j++){
 			string str1 = string("dirlights[");
-			_modeledobject[i]->SetUniformVariable("dirlights[0].direction", _dirlights[i].direction);
-			_modeledobject[i]->SetUniformVariable("dirlights[0].diffuse", _dirlights[i].diffuseColor);
-			_modeledobject[i]->SetUniformVariable("dirlights[0].specular", _dirlights[i].specColor);
+			_modeledobject[i]->SetUniformVariable(str1 + to_string(j) + "].direction", _dirlights[j].direction);
+			_modeledobject[i]->SetUniformVariable(str1 + to_string(j) + "].diffuse", _dirlights[j].diffuseColor);
+			_modeledobject[i]->SetUniformVariable(str1 + to_string(j) + "].specular", _dirlights[j].specColor);
+			_modeledobject[i]->SetUniformVariable(str1 + to_string(j) + "].intensity", _dirlights[j].intensity);
 		}
-		/*for (int i = 0; i < _numPointLights; i++){
+		for (int j = 0; j < _numPointLights; j++){
 			string str1 = string("pointlights[");
-			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(i) + "].position", _pointlights[i].position);
-			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(i) + "].diffuse", _pointlights[i].diffuseColor);
-			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(i) + "].specular", _pointlights[i].specColor);
-			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(i) + "].attenuation", _pointlights[i].attenuation);
-		}*/
+			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(j) + "].position", _pointlights[j].position);
+			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(j) + "].diffuse", _pointlights[j].diffuseColor);
+			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(j) + "].specular", _pointlights[j].specColor);
+			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(j) + "].intensity", _pointlights[j].intensity);
+			_modeledobject[i]->SetUniformVariable(str1 + std::to_string(j) + "].attenuation", _pointlights[j].attenuation);
+		}
 		_modeledobject[i]->Render(camera);
 	}
 	//_texturedobject->Render(camera);
