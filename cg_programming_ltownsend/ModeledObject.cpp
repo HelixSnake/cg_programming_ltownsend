@@ -1,9 +1,7 @@
 #include "ModeledObject.h"
 
-ModeledObject::ModeledObject(Mesh* mesh, char* texture){
-	objectState = nullptr;
-	renderMode = GL_TRIANGLES;
-	vertexBufferID = 0;
+ModeledObject::ModeledObject(Mesh* mesh, char* texture) : objectState(nullptr), renderMode(GL_TRIANGLES), 
+			vertexBufferID(0), material(nullptr){
 	SetPosition(vec3(0));
 	SetScale(vec3(1));
 	rotMatrix = mat4(1.0f);
@@ -13,7 +11,6 @@ ModeledObject::ModeledObject(Mesh* mesh, char* texture){
 	loadedMesh = mesh;
 	textureID = TextureStore::AddTexture(texture);
 	LoadTriangles();
-	material = nullptr;
 }
 
 ModeledObject::~ModeledObject(){

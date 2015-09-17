@@ -240,6 +240,8 @@ int main(){
 	glEnable( GL_BLEND );
 	glBlendEquation( GL_FUNC_ADD );
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);  
+
 
 	GLuint vertexArrayID = 0;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -358,6 +360,6 @@ int main(){
 
 	} while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
-
+		
 	return EXIT_WITH_SUCCESS;
 }

@@ -139,7 +139,9 @@ void AdvModeledObject::SetScale(vec3 scale){
 void AdvModeledObject::SetRotationMatrix(mat4 rotation){
 	this->rotMatrix = rotation;
 }
-
+mat4 AdvModeledObject::GetRotationMatrix(){
+	return this->rotMatrix;
+}
 
 void AdvModeledObject::AddRotation(vec3 axis, float angle){
 	rotMatrix = glm::rotate(rotMatrix, angle, axis);

@@ -19,8 +19,8 @@ uniform mat4 Proj;
 uniform mat4 View;
  
 mat4 I_VP = inverse(Proj * View);
-float PI = 3.14159265358979323846264;
 vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
+vec3 cameraDir = (inverse(View) * vec4(0,0,1,0)).xyz;
 
 void main(){
 
@@ -28,7 +28,7 @@ void main(){
 	vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
 
 	float alpha = pow(max(dot(cameraToPointVec, normal), 0), 2) * atmosphereAlpha;
-
+	
     // Output color = color of the texture at the specified UV
 	color = vec4(atmosphereColor, alpha);
 }

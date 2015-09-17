@@ -32,6 +32,7 @@ class AdvModeledObject{
 		void SetPosition(vec3 position);
 		void SetScale(vec3 scale);
 		void SetRotationMatrix(mat4 rotation);
+		mat4 GetRotationMatrix();
 		void AddRotation(vec3 axis, float angle);
 
 		vec3 GetPosition();

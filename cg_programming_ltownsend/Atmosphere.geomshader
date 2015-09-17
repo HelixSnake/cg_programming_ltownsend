@@ -21,19 +21,19 @@ void main() {
 	mat4 normalMatrix = transpose(inverse(MV));
 
 	UV = UVg[0];
-	normal = -(normalg[0].xyz);
+	normal = -normalg[0].xyz;
 	gl_Position = MVP * gl_in[0].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[0]).xyz), 0) * atmosphereThickness;
 	position = gl_Position;
     EmitVertex();
 	
 	UV = UVg[2];
-	normal = -(normalg[2].xyz);
+	normal = -normalg[2].xyz;
     gl_Position = MVP * gl_in[2].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[2]).xyz), 0) * atmosphereThickness;
 	position = gl_Position;
     EmitVertex();
 	
 	UV = UVg[1];
-	normal = -(normalg[1].xyz);
+	normal = -normalg[1].xyz;
 	gl_Position = MVP * gl_in[1].gl_Position + Proj * View * vec4(normalize((normalMatrix * normalg[1]).xyz), 0) * atmosphereThickness;
 	position = gl_Position;
     EmitVertex();

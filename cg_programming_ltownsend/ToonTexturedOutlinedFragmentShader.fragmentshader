@@ -24,8 +24,8 @@ struct PointLight {
 	float intensity;
 };
  
- #define NUM_DIR_LIGHTS 100
- #define NUM_POINT_LIGHTS 100
+ #define NUM_DIR_LIGHTS 20
+ #define NUM_POINT_LIGHTS 20
 // Values that stay constant for the whole mesh.
 uniform sampler2D DiffuseMap;
 
