@@ -37,4 +37,6 @@ class World{
 		int _numPointLights;
 		vector<DirectionLight> _dirlights;
 		vector<PointLight> _pointlights;
+		bool renderToggle;
+		bool spaceEdgeDetect;
 };

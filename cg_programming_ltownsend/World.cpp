@@ -3,6 +3,8 @@
 AdvModeledObject* _modeledobject[] = {nullptr};
 
 World::World(){
+	spaceEdgeDetect = false;
+	renderToggle = false;
 	_numDirLights = 0;
 	_numPointLights = 0;
 	for (int i = 0; i < NUM_OBJECTS; i++){
@@ -83,8 +85,8 @@ World::World(){
 	_modeledobject[1]->SetPosition(vec3(0, 0, 0));
 	_modeledobject[3]->SetPosition(vec3(0, 0, 0));
 	_modeledobject[7]->SetPosition(vec3(0, 0, 0));
-	_modeledobject[4]->SetPosition(vec3(0, 3, 0));
-	_modeledobject[2]->SetPosition(vec3(3, 0, 0));
+	_modeledobject[4]->SetPosition(vec3(-1.6, -1, 0));
+	_modeledobject[2]->SetPosition(vec3(1.6, -1, 0));
 	_modeledobject[5]->SetPosition(vec3(0, 0, 1000));
 	_modeledobject[6]->SetPosition(vec3(0, 0, 1000));
 	//TODO: fix normals for scaled objects
@@ -105,7 +107,7 @@ World::World(){
 	}
 	//SaveObjectStates();
 
-	resetKey = GLFW_KEY_SPACE;
+	resetKey = GLFW_KEY_Q;
 }
 
 World::~World(){
@@ -120,7 +122,7 @@ World::~World(){
 void World::ApplyShaders(){
 	_modeledobject[0]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[1]->SetShaderSetID(this->LoadShaderSet("advShader"));
-	//_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("iridescent"));
+	_modeledobject[2]->SetShaderSetID(this->LoadShaderSet("iridescent"));
 	_modeledobject[3]->SetShaderSetID(this->LoadShaderSet("advShader"));
 	_modeledobject[4]->SetShaderSetID(this->LoadShaderSet("toon"));
 	_modeledobject[7]->SetShaderSetID(this->LoadShaderSet("atmosphere"));
@@ -170,6 +172,11 @@ void World::ResetWorld(){
 }
 
 void World::Update(const float& deltaTime){
+	if (glfwGetKey(window, GLFW_KEY_SPACE) && !spaceEdgeDetect){
+		renderToggle = !renderToggle;
+	}
+	spaceEdgeDetect = glfwGetKey(window, GLFW_KEY_SPACE);
+
 	float earthTurnSpeed = 20;
 	if (glfwGetKey(window, GLFW_KEY_KP_ADD)) earthTurnSpeed = 400;
 	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT)) earthTurnSpeed = 5;
@@ -179,8 +186,8 @@ void World::Update(const float& deltaTime){
 	vec3 axis = vec3(0,sin(angle),-cos(angle));
 	_modeledobject[0]->AddRotation(vec3(0, 1, 0), deltaTime * earthTurnSpeed);
 	_modeledobject[1]->AddRotation(vec3(0, 1, 0), deltaTime * earthTurnSpeed/10);
-	_modeledobject[2]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
-	_modeledobject[4]->AddRotation(vec3(0, 1, 0), deltaTime * 10);
+	_modeledobject[2]->AddRotation(vec3(0, 1, 0), deltaTime * earthTurnSpeed/2);
+	_modeledobject[4]->AddRotation(vec3(0, 1, 0), deltaTime * earthTurnSpeed/2);
 	_modeledobject[3]->AddRotation(vec3(0, 1, 0), deltaTime * earthTurnSpeed*1.1);
 	_modeledobject[1]->SetPosition(vec3(_modeledobject[1]->GetRotationMatrix() * vec4(3, 0, 0, 0)));
 	ResetWorld();
@@ -190,6 +197,10 @@ void World::Render(const Camera& camera){
 	_numDirLights = _dirlights.size();
 	_numPointLights = _pointlights.size();
 	for (int i = 0; i < NUM_OBJECTS; i++){
+		if (i == 2 || i == 4){
+			if (!renderToggle) continue;
+		}
+		else if (renderToggle) continue;
 		if (_modeledobject[i] == nullptr) continue;
 		_modeledobject[i]->LoadMaterial();
 		_camera->setValuesIntoIDs();

@@ -281,7 +281,7 @@ int main(){
 	//dirlight.directionID = glGetUniformLocation(programID, "lightDir");
 	//camera.fwdVecID = glGetUniformLocation(programID, "cameraVec");
 
-	glm::vec3 position = glm::vec3( 0, 0, 0 );
+	glm::vec3 position = glm::vec3( 0, 0, 5 );
 	// horizontal angle : toward -Z
 	float horizontalAngle = 3.14f;
 	// vertical angle : 0, look at the horizon

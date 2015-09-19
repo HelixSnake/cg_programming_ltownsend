@@ -7,16 +7,34 @@ in vec4 position;
  
 // Ouput data
 out vec4 color;
+
+struct DirLight {
+	vec3 direction;
+	vec3 diffuse;
+	vec3 specular;
+	float intensity;
+};
+
+struct PointLight {
+	vec3 position;
+	vec3 diffuse;
+	vec3 specular;
+	vec3 attenuation;
+	float intensity;
+};
  
+#define NUM_DIR_LIGHTS 20
+#define NUM_POINT_LIGHTS 20
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
 uniform vec3 objectEmissiveColor = vec3(0,0,0);
 uniform float objectGlow = 0.0f;
 uniform vec3 lightAmbientColor = vec3(0,0,0);
 uniform float objectReflectance = 0;
-uniform vec3 lightDir;
-uniform vec3 lightDiffuseColor = vec3(1,1,1);
-uniform vec3 lightSpecColor = vec3(1,1,1);
+uniform DirLight dirlights[NUM_DIR_LIGHTS];
+uniform PointLight pointlights[NUM_POINT_LIGHTS];
+uniform int numpointlights = 0;
+uniform int numdirlights = 0;
 uniform float objectSpecFalloff = 20.0;
 uniform vec3 objectSpecColor = vec3(1,1,1);
 uniform vec3 cameraVec;
@@ -30,44 +48,79 @@ vec3 HSVtoRGB(vec3 color);
 
 void main(){
  
+	vec3 totalColor = vec3(0,0,0);
 	// EMISSIVE COLOR
 	vec3 emissiveColor = objectEmissiveColor * objectGlow;
+	totalColor += emissiveColor;
 
 	// AMBIENT COLOR
 	vec3 ambientColor = lightAmbientColor * objectReflectance;
+	totalColor += ambientColor;
 
-	// DIFFUSE COLOR
-	float diffuseIntensity = dot(-lightDir,normal);
-	diffuseIntensity = max(diffuseIntensity, 0);
-	vec3 newTextureColor = texture( myTextureSampler, UV ).rgb;
+	for (int i = 0; i < numdirlights; ++i)
+	{
+		float diffuseIntensity = dot(-dirlights[i].direction,normal);
+		diffuseIntensity = max(diffuseIntensity, 0);
+		vec3 newTextureColor = texture( myTextureSampler, UV ).rgb;
 
-	// SPECULAR COLOR
-	//vec3 halfVector = normalize(normalize(-lightDir) + normalize(-cameraVec));
-	//float specintensity = max(dot(halfVector, normal), 0);
-
-	mat4 I_VP = inverse(Proj * View);
+		mat4 I_VP = inverse(Proj * View);
  
-	vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
-	vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
+		vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
+		vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
 
-	vec3 reflectionVector = lightDir - dot(lightDir, normal) * 2 * normal;
-	float lightReflection = dot(cameraToPointVec, normalize(reflectionVector));
-	float specintensity = max(lightReflection, 0);
+		vec3 reflectionVector = dirlights[i].direction - dot(dirlights[i].direction, normal) * 2 * normal;
+		float lightReflection = dot(cameraToPointVec, normalize(reflectionVector));
+		float specintensity = max(lightReflection, 0);
 
-	newTextureColor = RGBtoHSV(newTextureColor);
-	newTextureColor.x += lightReflection + 1;
-	newTextureColor = HSVtoRGB(newTextureColor);
+		newTextureColor = RGBtoHSV(newTextureColor);
+		newTextureColor.x += lightReflection + 1;
+		newTextureColor = HSVtoRGB(newTextureColor);
 
-	vec3 diffuseColor = newTextureColor * lightDiffuseColor * diffuseIntensity;
+		totalColor += newTextureColor * dirlights[i].diffuse * diffuseIntensity * dirlights[i].intensity;
 
-	specintensity = pow(specintensity, objectSpecFalloff);
+		specintensity = pow(specintensity, objectSpecFalloff);
+		specintensity *= diffuseIntensity;
 
-	specintensity *= diffuseIntensity;
+		totalColor += dirlights[i].specular * objectSpecColor * specintensity;
+	}
 
-	vec3 specularColor = lightSpecColor * objectSpecColor * specintensity;
+	for (int i = 0; i < numpointlights; ++i)
+	{
+		vec3 pointLightDisp = position.xyz - pointlights[i].position;
+		float pointlightdistance = length(pointLightDisp);
+		vec3 pointlightdir = normalize(pointLightDisp);
+		
+		float attenuation = 1.0 / (pointlights[i].attenuation.x +
+		pointlights[i].attenuation.y * pointlightdistance +
+		pointlights[i].attenuation.z * pointlightdistance * pointlightdistance);
+
+		float diffuseIntensity = dot(-pointlightdir, normal) * attenuation * pointlights[i].intensity;;
+		diffuseIntensity = max(diffuseIntensity, 0);
+		vec3 newTextureColor = texture( myTextureSampler, UV ).rgb;
+
+		mat4 I_VP = inverse(Proj * View);
+ 
+		vec3 cameraPos = (inverse(View) * vec4(0,0,0,1)).xyz;
+		vec3 cameraToPointVec = normalize(cameraPos - (I_VP * position).xyz);
+
+		vec3 reflectionVector = pointlightdir - dot(pointlightdir, normal) * 2 * normal;
+		float lightReflection = dot(cameraToPointVec, normalize(reflectionVector));
+		float specintensity = max(lightReflection, 0);
+
+		newTextureColor = RGBtoHSV(newTextureColor);
+		newTextureColor.x += lightReflection + 1;
+		newTextureColor = HSVtoRGB(newTextureColor);
+
+		totalColor += newTextureColor * pointlights[i].diffuse * diffuseIntensity;
+
+		specintensity = pow(specintensity, objectSpecFalloff);
+		specintensity *= diffuseIntensity;
+
+		totalColor += pointlights[i].specular * objectSpecColor * specintensity;
+	}
 
 	// TOTAL COLOR
-    color = vec4(emissiveColor + ambientColor + diffuseColor + specularColor, 1);
+    color = vec4(totalColor, 1);
 
 }
 

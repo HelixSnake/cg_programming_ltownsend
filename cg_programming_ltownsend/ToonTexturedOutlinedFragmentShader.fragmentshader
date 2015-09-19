@@ -37,7 +37,7 @@ uniform int numdirlights = 0;
 uniform vec3 cameraVec;
 uniform int diffuseSteps = 3;
 uniform int specSteps = 2;
-uniform float minIntensity = 0.1;
+uniform float minIntensity = 0.05;
 
 void main(){
  
@@ -48,7 +48,6 @@ void main(){
 	for (int i = 0; i < numdirlights; i++)
 	{
 		float intensity = dot(-dirlights[i].direction, normal);
-		intensity = max(intensity, 0);
 
 		float newIntensity = 0;
 
@@ -72,6 +71,7 @@ void main(){
 			newSpecIntensity += step(currentStep, specintensity);
 		}
 		specintensity = newSpecIntensity / specSteps;
+		intensity = max(intensity, minIntensity);
 
 		outColor += texture( DiffuseMap, UV ).rgb * dirlights[i].diffuse * intensity;
 		outColor += dirlights[i].specular * specintensity * intensity;
@@ -88,7 +88,6 @@ void main(){
 		pointlights[i].attenuation.z * pointlightdistance * pointlightdistance);
 
 		float intensity = dot(-pointlightdir, normal) * attenuation;
-		intensity = max(intensity, 0);
 
 		float newIntensity = 0;
 
@@ -98,6 +97,7 @@ void main(){
 			newIntensity += step(currentStep, intensity);
 		}
 		intensity = newIntensity / diffuseSteps;
+		intensity = max(intensity, minIntensity);
 
 		vec3 reflectionVector = pointlightdir - dot(pointlightdir, normal) * 2 * normal;
 		float specintensity = max(dot(-cameraVec, normalize(reflectionVector)), 0);
