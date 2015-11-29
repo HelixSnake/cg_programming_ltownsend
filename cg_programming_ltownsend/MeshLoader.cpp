@@ -241,13 +241,14 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals){
 			for (int i = 0; i < numVerts; i++)
 			{
 				vec3 addedVectors = vec3(0,0,0);
-				uint VASI = vertAttachStartIndices[i];
-				uint VASI2;
-				if (i == numVerts - 1)
-					VASI2 = numFaces * 3;
-				else
-					VASI2 = vertAttachStartIndices[i + 1];
-				for (int j = VASI; j < VASI2; j++)
+				uint jLoopStart = vertAttachStartIndices[i];
+
+				//Set the loop to end at the next start index; if we're at the end of our list of start indices, set it to end at         
+				//the length of the normal attachment array, which is numFaces * 3
+				uint jLoopEnd = numFaces * 3;
+				if (i != numVerts - 1)
+					jLoopEnd = vertAttachStartIndices[i + 1];
+				for (int j = jLoopStart; j < jLoopEnd; j++)
 				{
 					uint VNA = vertNormalAttachments[j];
 					addedVectors += faceNormals[VNA];
@@ -293,7 +294,10 @@ bool MeshLoader::loadMesh(Mesh *mesh, const char* path, bool smoothNormals){
 				delete mesh->_tris;
 				return false;
 			}
-			crntMeshTri->uvs[j] = uvs[uvIndex];
+			if (numUVs == 0) 
+				crntMeshTri->uvs[j] = vec2(0, 0);
+			else
+				crntMeshTri->uvs[j] = uvs[uvIndex];
 
 			int normalIndex = faces[i][j * 3 + 2] - 1;
 			if (normalIndex >= numNormals) {

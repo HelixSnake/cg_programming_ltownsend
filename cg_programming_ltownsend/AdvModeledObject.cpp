@@ -241,7 +241,20 @@ void AdvModeledObject::LoadTriangles(){
 	for (int i = 0; i < loadedMesh->_numTris; ++i){
 		MeshTri currentTri = loadedMesh->_tris[i];
 		mat2x3 tanBiTanMat;
-		mat2 uvMat = mat2(currentTri.uvs[1]-currentTri.uvs[0], currentTri.uvs[2]-currentTri.uvs[0]);
+		bool hasUVs = false;
+		for (int j = 0; j < 3; j++)
+		{
+			if (currentTri.uvs[j].x != 0 || currentTri.uvs[j].y != 0) hasUVs = true;
+		}
+		mat2 uvMat;
+		if (hasUVs)
+		{
+			uvMat = mat2(currentTri.uvs[1]-currentTri.uvs[0], currentTri.uvs[2]-currentTri.uvs[0]);
+		}
+		else
+		{
+			uvMat = mat2(0, 1, 1, 0);
+		}
 		vec3 edge1 = currentTri.vertices[1]-currentTri.vertices[0];
 		vec3 edge2 = currentTri.vertices[2]-currentTri.vertices[0];
 		mat2x3 edgeMat = mat2x3(edge1, edge2);

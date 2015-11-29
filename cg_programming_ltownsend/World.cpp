@@ -25,13 +25,15 @@ World::World(){
 	//_pointlights[1].attenuation = vec3(1, 0, 1);
 	Mesh mesh;
 	Mesh mesh2;
+	Mesh mesh3;
 	MeshLoader::loadMesh(&mesh, "sphere.obj");
 	MeshLoader::loadMesh(&mesh2, "stanford_bunny.obj");
+	MeshLoader::loadMesh(&mesh3, "stanford_bunny.obj", true);
 	_modeledobject[0] = new AdvModeledObject(&mesh);
 	_modeledobject[1] = new AdvModeledObject(&mesh);
 	_modeledobject[2] = new AdvModeledObject(&mesh2);
 	_modeledobject[3] = new AdvModeledObject(&mesh);
-	_modeledobject[4] = new AdvModeledObject(&mesh2);
+	_modeledobject[4] = new AdvModeledObject(&mesh3);
 	_modeledobject[5] = new AdvModeledObject(&mesh);
 	_modeledobject[6] = new AdvModeledObject(&mesh);
 	_modeledobject[7] = new AdvModeledObject(&mesh);
