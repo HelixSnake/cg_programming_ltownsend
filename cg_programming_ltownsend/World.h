@@ -20,15 +20,19 @@ class World{
 		void setCamera(Camera* camera) {_camera = camera;};
 		void Update(const float& deltaTime);
 		void Render(const Camera& camera);
+		void ApplyShader(AdvModeledObject* obj);
 		void ApplyShaders();
 		void AddShaderSet(string name, GLuint programID);
 		GLuint LoadShaderSet(string name);
 		void SetDefaultShaderSet(GLuint shadersetID);
+		AdvModeledObject* CreateMotifCube();
+		void CreateDefaultMotifCubes();
 		
 	private:
+		int _iterations;
+		Mesh _motifCubeMesh;
 		int resetKey;
-		static const int NUM_OBJECTS = 1;
-		AdvModeledObject* _modeledobject[NUM_OBJECTS];
+		vector<AdvModeledObject*> _motifCubes;
 		TexturedObject* _texturedobject;
 		map<string, GLuint> _shadersets;
 		GLuint _defaultShaderSet;
@@ -39,4 +43,5 @@ class World{
 		vector<PointLight> _pointlights;
 		bool renderToggle;
 		bool spaceEdgeDetect;
+		bool addMotifEdgeDetect;
 };

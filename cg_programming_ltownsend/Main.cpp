@@ -272,6 +272,8 @@ int main(){
 	world.AddShaderSet("iridescent", iridescentShaderID);
 	world.AddShaderSet("advShader", advShaderID);
 	world.AddShaderSet("atmosphere", atmosphereShaderID);
+	//world.ApplyShaders();
+	world.CreateDefaultMotifCubes();
 	world.ApplyShaders();
 	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
 	//camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
